@@ -11,6 +11,7 @@
     <members>Account</members>
     <members>Contact</members>
     <members>Opportunity</members>
+    <members>Event</members>
     <name>CustomObject</name>
   </types>
 
@@ -19,6 +20,7 @@
     <members>Account.*</members>
     <members>Contact.*</members>
     <members>Opportunity.*</members>
+    <members>Event.*</members>
     <members>*__c</members>
     <name>CustomField</name>
   </types>
@@ -28,6 +30,7 @@
     <members>Account-*</members>
     <members>Contact-*</members>
     <members>Opportunity-*</members>
+    <members>Event-*</members>
     <members>*-*</members>
     <name>Layout</name>
   </types>
@@ -37,6 +40,7 @@
     <members>Account.*</members>
     <members>Contact.*</members>
     <members>Opportunity.*</members>
+     <members>Event.*</members>
     <members>*</members>
     <name>ValidationRule</name>
   </types>
@@ -46,6 +50,7 @@
     <members>Account.*</members>
     <members>Contact.*</members>
     <members>Opportunity.*</members>
+    <members>Event.*</members>
     <members>*</members>
     <name>ListView</name>
   </types>
@@ -55,6 +60,7 @@
     <members>Account.*</members>
     <members>Contact.*</members>
     <members>Opportunity.*</members>
+     <members>Event.*</members>
     <members>*</members>
     <name>RecordType</name>
   </types>
@@ -64,6 +70,7 @@
     <members>Account</members>
     <members>Contact</members>
     <members>Opportunity</members>
+      <members>Event</members>
     <members>*</members>
     <name>Workflow</name>
   </types>
