@@ -32,5 +32,9 @@
         <members>*</members>
         <name>StaticResource</name>
     </types>
+    <types>
+        <members>Job_Application__c</members>
+        <name>CustomObject</name>
+    </types>
     <version>58.0</version>
 </Package>
