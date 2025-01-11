@@ -27,7 +27,7 @@
 
   <!-- Retrieve layouts -->
   <types>
-    <members>Account-*</members>
+    <members>Account*</members>
     <members>Contact-*</members>
     <members>Opportunity-*</members>
     <members>Event-*</members>
