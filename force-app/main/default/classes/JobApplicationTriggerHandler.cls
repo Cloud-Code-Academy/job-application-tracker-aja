@@ -7,8 +7,7 @@ public with sharing class JobApplicationTriggerHandler extends TriggerHandler {
         List<Job_Application__c> updatedApplications = new List<Job_Application__c>();
 
         //loop through updated Job Application records to see if Status was changed
-        for (SObject sObj : Trigger.new) {
-            Job_Application__c application = (Job_Application__c) sObj; // Cast SObject to Job_Application__c
+        for (Job_Application__c application : (List<Job_Application__c>) Trigger.new) {
             Job_Application__c oldApplication = (Job_Application__c) Trigger.oldMap.get(application.Id); //Cast Trigger.oldMap values
             if (application.Status__c != oldApplication.Status__c) {
                 updatedApplications.add(application);
