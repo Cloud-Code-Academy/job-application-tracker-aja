@@ -1,6 +1,6 @@
 public with sharing class JobApplicationTriggerHandler extends TriggerHandler {
    
-    //Method that handles the logic after an update operation
+    //Method  that handles the logic after an update operation
    public override void afterUpdate() {
 
         //List to hold job applications where status changes
