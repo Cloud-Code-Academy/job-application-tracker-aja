@@ -1,22 +1,38 @@
 public with sharing class JobApplicationTriggerHandler extends TriggerHandler {
    
-    //Method that handles the logic after an update operation
-   public override void afterUpdate() {
+    //Override afterInsert to handle insert logic
+    public override void afterInsert() {
+        afterInsertOrUpdate();
+    }
+
+    // Override afterUpdate to handle update logic
+    public override void afterUpdate() {
+        afterInsertOrUpdate();
+    }
+    
+    //Method that handles the logic for after insert and after update
+   public void afterInsertOrUpdate() {
 
         //List to hold job applications where status changes
-        List<Job_Application__c> updatedApplications = new List<Job_Application__c>();
+        List<Job_Application__c> processedApplications = new List<Job_Application__c>();
 
-        //loop through updated Job Application records to see if Status was changed
-        for (Job_Application__c application : (List<Job_Application__c>) Trigger.new) {
-            Job_Application__c oldApplication = (Job_Application__c) Trigger.oldMap.get(application.Id); //Cast Trigger.oldMap values
-            if (application.Status__c != oldApplication.Status__c) {
-                updatedApplications.add(application);
+        // Determine whether it's an insert or update
+        if(Trigger.isInsert) {
+            //For inserts, add all new records to the list
+            processedApplications.addAll((List<Job_Application__c>) Trigger.new);
+        } else if (Trigger.isUpdate) {
+            //For updates, compare Status__c field and add to the list if changed
+            for (Job_Application__c application : (List<Job_Application__c>) Trigger.new) {
+                Job_Application__c oldApplication = (Job_Application__c) Trigger.oldMap.get(application.Id); //Cast trigger.oldMap values
+                if (application.Status__c != oldApplication.Status__c) {
+                    processedApplications.add(application);
+                }
             }
         }
 
         //Create Tasks based on new Status
-        if (!updatedApplications.isEmpty()) {
-            createTasksForStatusChange(updatedApplications);
+        if (!processedApplications.isEmpty()) {
+            createTasksForStatusChange(processedApplications);
         }
     }
 
