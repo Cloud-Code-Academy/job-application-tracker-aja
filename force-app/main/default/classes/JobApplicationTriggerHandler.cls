@@ -1,5 +1,13 @@
 public with sharing class JobApplicationTriggerHandler extends TriggerHandler {
    
+    public override void beforeInsert() {
+        handlePrimaryContactAssignment (Trigger.new);
+    }
+
+    public override void beforeUpdate() {
+        handlePrimaryContactAssignment(Trigger.new);
+    }
+    
     //Override afterInsert to handle insert logic
     public override void afterInsert() {
         afterInsertOrUpdate();
@@ -9,6 +17,58 @@ public with sharing class JobApplicationTriggerHandler extends TriggerHandler {
     public override void afterUpdate() {
         afterInsertOrUpdate();
     }
+
+    public void handlePrimaryContactAssignment(List<Job_Application__c> jobApplications) {
+        if (jobApplications == null || jobApplications.isEmpty()) {
+            return; // No applications to process
+        }
+    
+        // Collect related Job Application and Account IDs
+        Set<Id> jobApplicationIds = new Set<Id>();
+        Set<Id> accountIds = new Set<Id>();
+        for (Job_Application__c jobApp : jobApplications) {
+            if (jobApp.PrimaryContact__c == null) {
+                if (jobApp.Id != null) {
+                    jobApplicationIds.add(jobApp.Id);
+                }
+                if (jobApp.Account__c != null) {
+                    accountIds.add(jobApp.Account__c);
+                }
+            }
+        }
+    
+        // Return early if no relevant records
+        if (jobApplicationIds.isEmpty() && accountIds.isEmpty()) {
+            return;
+        }
+    
+        // Fetch related Contacts
+        Map<Id, List<Contact>> relatedContactsMap = new Map<Id, List<Contact>>();
+        for (Contact contact : [
+            SELECT Id, Job_Application__c, AccountId
+            FROM Contact
+            WHERE Job_Application__c IN :jobApplicationIds OR AccountId IN :accountIds
+        ]) {
+            Id relatedId = contact.Job_Application__c != null ? contact.Job_Application__c : contact.AccountId;
+            if (!relatedContactsMap.containsKey(relatedId)) {
+                relatedContactsMap.put(relatedId, new List<Contact>());
+            }
+            relatedContactsMap.get(relatedId).add(contact);
+        }
+    
+        // Assign Primary Contacts
+        for (Job_Application__c jobApp : jobApplications) {
+            if (jobApp.PrimaryContact__c == null) {
+                if (relatedContactsMap.containsKey(jobApp.Id) && !relatedContactsMap.get(jobApp.Id).isEmpty()) {
+                    jobApp.PrimaryContact__c = relatedContactsMap.get(jobApp.Id)[0].Id;
+                } else if (jobApp.Account__c != null && relatedContactsMap.containsKey(jobApp.Account__c)
+                         && !relatedContactsMap.get(jobApp.Account__c).isEmpty()) {
+                    jobApp.PrimaryContact__c = relatedContactsMap.get(jobApp.Account__c)[0].Id;
+                }
+            }
+        }
+    }
+    
     
     //Method that handles the logic for after insert and after update
    public void afterInsertOrUpdate() {
