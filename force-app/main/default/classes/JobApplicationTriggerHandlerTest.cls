@@ -177,7 +177,7 @@ static void testJobApplicationCreationWithSavedStatus() {
         // Verify tasks were created
         Assert.areEqual(8, createdTasks.size(), 'The number of tasks created should match the expected count for "Applying" status.');
 
-        // Verify new task details
+        // Verify task details
         Map<String, Task> tasksBySubject = new Map<String, Task>();
         for (Task t : createdTasks) {
             tasksBySubject.put(t.Subject, t);
@@ -202,11 +202,11 @@ static void testJobApplicationCreationWithSavedStatus() {
         insert jobApplication;
 
         jobApplication.Status__c = 'Applied';
+
         update jobApplication; // 4 more tasks created
 
         List<Task> createdTasks = [SELECT Subject FROM Task WHERE WhatId = :jobApplication.Id
         ];
-
         Assert.areEqual(9, createdTasks.size(), 'The number of tasks created should match the expected count for "Applied" status');
     }
 
@@ -219,44 +219,52 @@ static void testJobApplicationCreationWithSavedStatus() {
         insert jobApplication;
 
         jobApplication.Status__c = 'Interviewing';
+
         update jobApplication; //5 more tasks created
 
         List<Task> createdTasks = [
             SELECT Subject FROM Task WHERE WhatId = :jobApplication.Id];
 
             Assert.areEqual(9, createdTasks.size(), 'The number of tasks created should match the expected count for "Interviewing" status');
+
     }
 
     @isTest
     static void testUpdateToNegotiating() {
         Job_Application__c jobApplication = new Job_Application__c(
             Name = 'Test Job Application',
+
             Status__c = 'Interviewing' //5 tasks created
         );
         insert jobApplication;
 
         jobApplication.Status__c = 'Negotiating';
+
         update jobApplication; //3 more tasks created
 
         List<Task> createdTasks = [
             SELECT Subject FROM Task WHERE WhatId = :jobApplication.Id];
 
             Assert.areEqual(8, createdTasks.size(),'The number of tasks created should match the expected count for "Negotiating" status');
+
     }
 
     @isTest
     static void testUpdateToAccepted() {
         Job_Application__c jobApplication = new Job_Application__c(
             Name = 'Test Job Application',
-            Status__c = 'Negotiating' //3 tasks created 
+            Status__c = 'Negotiating' //3 tasks created
+
         );
         insert jobApplication;
 
         jobApplication.Status__c = 'Accepted';
+
         update jobApplication; // 3 more tasks created
 
         List<Task> createdTasks = [
             SELECT Subject FROM Task WHERE WhatId = :jobApplication.Id];
+
 
             Assert.areEqual(6, createdTasks.size(),'The number of tasks created should match the expected count for "Accepted" status');
     }
@@ -265,17 +273,20 @@ static void testJobApplicationCreationWithSavedStatus() {
     static void testUpdateToClosed() {
         Job_Application__c jobApplication = new Job_Application__c(
             Name = 'Test Job Application',
+
             Status__c = 'Interviewing' //5 tasks created
         );
         insert jobApplication;
 
         jobApplication.Status__c = 'Closed';//2 more tasks created
+
         update jobApplication;
 
         List<Task> createdTasks = [
             SELECT Subject FROM Task WHERE WhatId = :jobApplication.Id];
 
             Assert.areEqual(7, createdTasks.size(),'The number of tasks created should match the expected count for "Closed" status');
+
     }
 
 
@@ -285,7 +296,9 @@ static void testJobApplicationCreationWithSavedStatus() {
         // Create a Job Application record with an initial status
         Job_Application__c jobApplication = new Job_Application__c(
             Name = 'Test Job Application',
+
             Status__c = 'Saved' //3 tasks created
+
         );
         insert jobApplication;
 
@@ -301,6 +314,7 @@ static void testJobApplicationCreationWithSavedStatus() {
 
         // Step 4: Validate Results
         Assert.areEqual(3, createdTasks.size(), 'No new tasks should be created when status does not change.');
+
     }
 
     @isTest
@@ -334,5 +348,3 @@ static void testJobApplicationCreationWithSavedStatus() {
         TriggerHandler.clearAllBypasses();
     }
 }
-
-
