@@ -2,8 +2,7 @@ public without sharing class InterviewReminder implements Database.Batchable<sOb
 
     //Get events scheduled tomorrow       
     public Database.QueryLocator start(Database.BatchableContext bc){
-        string query = 'SELECT Id, Owner.Email, OwnerId, Subject, WhoId, WhatId, Location, StartDateTime, EndDateTime, Type FROM Event WHERE DAY_ONLY(StartDateTime) = NEXT_N_DAYS:1'; 
-        //AND WhatId IN (SELECT Id FROJob_Application__cM )';
+        string query = 'SELECT Id, Owner.Email, OwnerId, Owner.FirstName, Subject, WhoId, WhatId, Location, StartDateTime, EndDateTime, Type FROM Event WHERE DAY_ONLY(StartDateTime) = NEXT_N_DAYS:1'; 
         return Database.getQueryLocator(query);
     }
 
@@ -15,12 +14,19 @@ public without sharing class InterviewReminder implements Database.Batchable<sOb
             System.debug(s.Owner.Email);
            
             if (s.OwnerId != null && s.Owner.Email != null) {
-                Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
-                email.setToAddresses(new String[] {s.Owner.Email});
-                email.setSubject('Reminder: Interview Scheduled Tomorrow');
-                email.setPlainTextBody('This is a friendly reminder that an interview is scheduled for tomorrow at ' + s.StartDateTime);
-                email.setWhatId(s.WhatId); //Related the email to job application
-                emails.add(email);
+
+                try{
+                    Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
+                    email.setToAddresses(new String[] {s.Owner.Email});
+                    email.setSubject('Reminder: Interview Scheduled Tomorrow');
+                    email.setHtmlBody('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Interview Reminder</title></head><body><p>Dear ' + s.Owner.FirstName + ',</p><p>This is a reminder about your upcoming interview for the <strong>' + s.Subject + '</strong> position at <strong>((Location)) </strong>.</p><p><strong>Details:</strong></p><ul><li><strong>Date:</strong>' + s.StartDateTime.date() + '</li><li><strong>Time:</strong>' + s.StartDateTime.format('hh:mm a') + '</li><li><strong>Location:</strong>' + s.Location + '</li></ul><p>If this is a virtual interview, join using the following link:</p><p><a href="{!VirtualLink}">{!VirtualLink}</a></p><p>Best regards,</p><p>Your Recruitment Team</p></body></html>');
+                    email.setWhatId(s.WhatId); //Related the email to job application
+                    emails.add(email);
+                }catch (Exception e){
+                    System.debug(e.getMessage());
+                }
+                
+                
             }
         }
         if(!emails.isEmpty()){
