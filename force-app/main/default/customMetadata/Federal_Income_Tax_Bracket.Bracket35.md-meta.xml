@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Bracket35</label>
+    <protected>false</protected>
+    <values>
+        <field>Federal_Income_Tax_Rate__c</field>
+        <value xsi:type="xsd:double">0.35</value>
+    </values>
+    <values>
+        <field>Lower_Bound__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Max__c</field>
+        <value xsi:type="xsd:double">609350.0</value>
+    </values>
+    <values>
+        <field>Min__c</field>
+        <value xsi:type="xsd:double">243726.0</value>
+    </values>
+    <values>
+        <field>Tax_Rate__c</field>
+        <value xsi:type="xsd:double">35.0</value>
+    </values>
+    <values>
+        <field>Upper_Bound__c</field>
+        <value xsi:nil="true"/>
+    </values>
+</CustomMetadata>
