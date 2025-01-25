@@ -7,10 +7,6 @@
         <value xsi:type="xsd:double">0.12</value>
     </values>
     <values>
-        <field>Lower_Bound__c</field>
-        <value xsi:nil="true"/>
-    </values>
-    <values>
         <field>Max__c</field>
         <value xsi:type="xsd:double">47150.0</value>
     </values>
@@ -21,9 +17,5 @@
     <values>
         <field>Tax_Rate__c</field>
         <value xsi:type="xsd:double">12.0</value>
-    </values>
-    <values>
-        <field>Upper_Bound__c</field>
-        <value xsi:nil="true"/>
     </values>
 </CustomMetadata>
