@@ -13,9 +13,7 @@ private class InterviewReminderTest {
     }
     @isTest
     static void testEmailCount() {
-        
         System.assertEquals(0, [SELECT COUNT() FROM EmailMessage WHERE RelatedToId IN (SELECT Id FROM Job_Application__c WHERE Name = 'JobApplicationName')] , 'There should be no found email at this stage of the test');
-
         Test.startTest();
          // Call the batchable class
          InterviewReminder batchJob = new InterviewReminder();
