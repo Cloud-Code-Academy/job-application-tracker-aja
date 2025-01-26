@@ -26,6 +26,7 @@ public with sharing class JobApplicationTriggerHandler extends TriggerHandler {
         // Collect related Job Application and Account IDs
         Set<Id> jobApplicationIds = new Set<Id>();
         Set<Id> accountIds = new Set<Id>();
+        
         for (Job_Application__c jobApp : jobApplications) {
             if (jobApp.PrimaryContact__c == null) {
                 if (jobApp.Id != null) {
@@ -37,8 +38,8 @@ public with sharing class JobApplicationTriggerHandler extends TriggerHandler {
             }
         }
     
-        // Return early if no relevant records
-        if (jobApplicationIds.isEmpty() && accountIds.isEmpty()) {
+        // Return early if no job application Ids
+        if (jobApplicationIds.isEmpty()) {
             return;
         }
     

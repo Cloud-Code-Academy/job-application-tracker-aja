@@ -75,6 +75,23 @@
     <name>Workflow</name>
   </types>
 
+  <types>
+    <members>Tax_Rate.Social_Security</members>
+    <members>Tax_Rate.Medicare</members>
+    <name>CustomMetadata</name>
+</types>
+
+<types>
+    <members>Federal_Income_Tax_Bracket.Bracket10</members>
+    <members>Federal_Income_Tax_Bracket.Bracket12</members>
+    <members>Federal_Income_Tax_Bracket.Bracket22</members>
+    <members>Federal_Income_Tax_Bracket.Bracket24</members>
+    <members>Federal_Income_Tax_Bracket.Bracket32</members>
+    <members>Federal_Income_Tax_Bracket.Bracket35</members>
+    <members>Federal_Income_Tax_Bracket.Bracket37</members>
+    <name>CustomMetadata</name>
+</types>
+
   <!-- Set the API version to match your Salesforce Org -->
   <version>58.0</version>
 </Package>
