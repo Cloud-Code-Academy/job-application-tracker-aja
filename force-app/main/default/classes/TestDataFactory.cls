@@ -70,10 +70,10 @@ public class TestDataFactory {
         return testJob;
     }
 
-    //Follow_up_Date__c
-
     public static Event createEvent(Id ownerIdParam, Id contactIdParam, Id jobApplicationIdParam, String locationParam){
-        Event testInterviewTomorrow = new Event(OwnerId = ownerIdParam, Subject = 'Interview', WhoId = contactIdParam, WhatId = jobApplicationIdParam, Location = locationParam, StartDateTime = DateTime.newInstance(Date.today().addDays(1), Time.newInstance(9,0,0,0)), EndDateTime = DateTime.newInstance(Date.today().addDays(1), Time.newInstance(10,0,0,0)));
+        Date nextBusinessDay = BusinessDayUtils.getNextBusinessDay();
+        System.debug(nextBusinessDay);
+        Event testInterviewTomorrow = new Event(OwnerId = ownerIdParam, Subject = 'Interview', WhoId = contactIdParam, WhatId = jobApplicationIdParam, Location = locationParam, StartDateTime = DateTime.newInstance(nextBusinessDay, Time.newInstance(9,0,0,0)), EndDateTime = DateTime.newInstance(nextBusinessDay, Time.newInstance(10,0,0,0)));
         insert testInterviewTomorrow;
         return testInterviewTomorrow;
     }
