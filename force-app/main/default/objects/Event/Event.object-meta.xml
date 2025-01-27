@@ -156,6 +156,7 @@
     </actionOverrides>
     <compactLayoutAssignment>Job_Application_App_Layout</compactLayoutAssignment>
     <enableFeeds>false</enableFeeds>
+    <recordTypeTrackHistory>false</recordTypeTrackHistory>
     <searchLayouts></searchLayouts>
     <sharingModel>Private</sharingModel>
 </CustomObject>
