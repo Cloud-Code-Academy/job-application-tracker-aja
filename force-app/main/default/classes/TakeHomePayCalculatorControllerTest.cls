@@ -83,7 +83,7 @@ public with sharing class TakeHomePayCalculatorControllerTest {
                 } else {
                     taxableIncome = grossIncome - bracket.Min__c;
                 }
-                expectedTax += taxableIncome * (bracket.Tax_Rate__c / 100);
+                expectedTax += taxableIncome * (bracket.Federal_Income_Tax_Rate__c);
                 if (grossIncome <= bracket.Max__c) {
                     break;
                 }

@@ -1,18 +1,18 @@
 public with sharing class TakeHomePayCalculatorController {
-
-    @AuraEnabled
+    
+     @AuraEnabled
     public static Map<String, Decimal> calculatePayPeriodDetails(Decimal grossSalary) {
         if (grossSalary == null || grossSalary <= 0) {
-            throw new IllegalArgumentException('Gross salary must be a positive value.');
+            throw new AuraHandledException('Gross salary must be a positive value.'); //AuraHandledException
         }
 
         // Initialize result map
         Map<String, Decimal> results = new Map<String, Decimal>();
 
-        // Fetch the pay periods from Custom Metadata
+        // Fetch the pay periods from Custom Metadata through the helper class
         Map<String, Decimal> payPeriods = PayPeriodHelper.getPayPeriods();
 
-        // Calculate gross amounts based on dynamic pay periods
+        // Calculate gross amounts based on pay periods
         Decimal weeklyGross = grossSalary / payPeriods.get('Weekly');
         Decimal biweeklyGross = grossSalary / payPeriods.get('Bi_weekly');
         Decimal monthlyGross = grossSalary / payPeriods.get('Monthly');
@@ -46,6 +46,7 @@ public with sharing class TakeHomePayCalculatorController {
         Decimal annualNet = grossSalary - annualTotal;
 
         // Populate results map
+        // TODO: results.weeklySocialSecurityTax = weeklySocial.setScale(2);
         results.put('Weekly Social Security Tax', weeklySocial.setScale(2));
         results.put('Biweekly Social Security Tax', biweeklySocial.setScale(2));
         results.put('Monthly Social Security Tax', monthlySocial.setScale(2));
@@ -77,7 +78,7 @@ public with sharing class TakeHomePayCalculatorController {
     @AuraEnabled
     public static Decimal calculateSocialSecurityTax(Decimal grossIncome) {
         if (grossIncome == null || grossIncome <= 0) {
-            throw new IllegalArgumentException('Gross income must be a positive value.');
+            throw new AuraHandledException('Gross income must be a positive value.');
         }
         Decimal socialSecurityRate = TaxRateHelper.getTaxRate('Social_Security');
         return grossIncome * socialSecurityRate;
@@ -86,7 +87,7 @@ public with sharing class TakeHomePayCalculatorController {
     @AuraEnabled
     public static Decimal calculateMedicareTax(Decimal grossIncome) {
         if (grossIncome == null || grossIncome <= 0) {
-            throw new IllegalArgumentException('Gross income must be a positive value.');
+            throw new AuraHandledException('Gross income must be a positive value.');
         }
         Decimal medicareRate = TaxRateHelper.getTaxRate('Medicare');
         return grossIncome * medicareRate;
@@ -95,13 +96,13 @@ public with sharing class TakeHomePayCalculatorController {
     @AuraEnabled
     public static Decimal calculateFederalIncomeTax(Decimal grossIncome) {
         if (grossIncome == null || grossIncome <= 0) {
-            throw new IllegalArgumentException('Gross income must be a positive value.');
+            throw new AuraHandledException('Gross income must be a positive value.');
         }
 
         List<Federal_Income_Tax_Bracket__mdt> brackets = TaxRateHelper.getFederalTaxBrackets();
-        Decimal federalTax = 0;
 
         // Iterate through tax brackets to calculate tax
+        Decimal federalTax = 0;
         for (Federal_Income_Tax_Bracket__mdt bracket : brackets) {
             if (grossIncome > bracket.Min__c) {
                 Decimal taxableIncome = 0;
@@ -110,7 +111,7 @@ public with sharing class TakeHomePayCalculatorController {
                 } else {
                     taxableIncome = grossIncome - bracket.Min__c;
                 }
-                federalTax += taxableIncome * (bracket.Tax_Rate__c / 100);
+                federalTax += taxableIncome * (bracket.Federal_Income_Tax_Rate__c);
                 if (grossIncome <= bracket.Max__c) {
                     break;
                 }

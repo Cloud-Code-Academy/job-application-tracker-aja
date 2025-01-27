@@ -9,13 +9,13 @@ public with sharing class TaxRateHelper {
 
         try {
             Tax_Rate__mdt taxRateRecord = [
-                SELECT Tax_Rate__c
+                SELECT Tax_Rate_Decimal__c
                 FROM Tax_Rate__mdt
                 WHERE DeveloperName = :taxType
                 WITH SECURITY_ENFORCED
                 LIMIT 1
             ];
-            return taxRateRecord != null ? taxRateRecord.Tax_Rate__c / 100 : 0;
+            return taxRateRecord != null ? taxRateRecord.Tax_Rate_Decimal__c: 0;
         } catch (Exception e) {
             System.debug('Error fetching tax rate for: ' + taxType + ', Error: ' + e.getMessage());
             return 0;
@@ -26,9 +26,9 @@ public with sharing class TaxRateHelper {
     public static List<Federal_Income_Tax_Bracket__mdt> getFederalTaxBrackets() {
         try {
             return [
-                SELECT Tax_Rate__c, Min__c, Max__c
+                SELECT Federal_Income_Tax_Rate__c, Min__c, Max__c
                 FROM Federal_Income_Tax_Bracket__mdt
-                WITH SECURITY_ENFORCED
+                WITH SECURITY_ENFORCED //security best practice 
                 ORDER BY Min__c ASC
             ];
         } catch (Exception e) {
