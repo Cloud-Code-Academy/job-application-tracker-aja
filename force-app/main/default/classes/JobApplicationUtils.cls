@@ -5,17 +5,15 @@ public with sharing class JobApplicationUtils {
             request.setMethod('POST');
             request.setHeader('Content-Type', 'application/json');
             //Define the JSON payload
-            String jsonBody = '{"keywords": "Salesforce", "location": "", "salary": 1}';
+            String jsonBody = '{"keywords": "Salesforce", "location": "Raleigh", "salary": 1}';
             request.setBody(jsonBody);
             return request;
     }
     public static List<Object> parseResponse(HttpResponse response){
-        System.debug('HttpResponse: ' + response);
         //Parse the JSON string into a Map
         Map<String, Object> parsedResponse = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
         //Get the 'jobs' list from the parsed response
         List<Object> jobs = (List<Object>) parsedResponse.get('jobs');
-        System.debug('parsed response: ' + jobs);
         return jobs;
     }
     public static void createJobApplicationRecords(List<Object> jobs){
@@ -38,13 +36,11 @@ public with sharing class JobApplicationUtils {
             String jobDescription = StringUtils.sanitizeString((String)job.get('snippet'));
             jobApp.description__c = jobDescription.substring(4, jobDescription.length()-4); //removes nbsp which remains at start and end of string
             String salary = (String) job.get('salary');
-            if(salary.isNumeric()){
-                try{
-                    jobApp.salary__c = Decimal.valueOf(salary);
-                }catch(Exception e){
-                    System.debug(e.getMessage());
-                }
-            }
+            Decimal parsedSalary = JobApplicationUtils.parseSalary(salary);
+            jobApp.Salary__c = parsedSalary;
+
+
+
             String companyName = (String) job.get('company');
             jobApp.Account__c = AccountUtils.getOrCreateAccount(companyName);
             jobApplicationsList.add(jobApp);
@@ -55,31 +51,85 @@ public with sharing class JobApplicationUtils {
         }
     }
     private static Decimal parseSalary(String salaryAsText){
-        List<String> regularExpressions = new List<String>();
-        //First pattern example: $109k - $120k
-        String regExpression2 = '^\\$([0-9]+)k([\\s]+)-([\\s]+)\\$([0-9]+)k$';
-        //Second pattern example: $109k
-        String regExpression1 = '^\\$([0-9]+)k';
-        //Third pattern example: $50 per hour
-        String regExpression3 = 'per\\shour';
-        //Fourth pattern example: $50 /hr
-        String regExpression4 = '/hr';
+        System.debug('Salary as text: ' + salaryAsText);
+        Decimal decimalReturnValue;
         
-        List<Pattern> patterns = new List<Pattern>();
-        for(String regularExpression : regularExpressions){
-            Pattern pattern = Pattern.compile(regularExpression);
-            patterns.add(pattern);
+        //First pattern example: $109k - $120k, or $109k-$120k
+        String regExpression1 = '^\\$([0-9]+)k([\\s]*)-([\\s]*)\\$([0-9]+)k$';
+        Boolean matches1 = Pattern.matches(regExpression1,salaryAsText);
+        
+        //Second pattern example: $109k
+        String regExpression2 = '^\\$([0-9]+)k';
+        Boolean matches2 = Pattern.matches(regExpression2,salaryAsText);
+
+        //Third pattern example: $50 - $60 per hour, or $50-$60 per hour
+        String regExpression3 = '\\$([0-9]+)([\\s]*)-([\\s]*)\\$([0-9]+)([\\s]+)per hour';
+        Boolean matches3 = Pattern.matches(regExpression3,salaryAsText);
+        
+        //Fourth pattern example: $50 - $60 per hour, or $50-60 per hour
+        String regExpression4 = '\\$([0-9]+)([\\s]*)per hour';
+        Boolean matches4 = Pattern.matches(regExpression4,salaryAsText);
+        
+        try{
+            if(matches1 == true){
+                //Matches first pattern example: $109k - $120k. Take the high bound and transform into an integer
+                System.debug('Matches first pattern');
+                Integer stringLength = salaryAsText.length();
+                Integer indexOfDash = salaryAsText.indexOf('-');
+                String highBoundSalaryAsText = salaryAsText.right(stringLength - indexOfDash);
+                highBoundSalaryAsText = highBoundSalaryAsText.replace('-',''); 
+                highBoundSalaryAsText = highBoundSalaryAsText.replace('$','');
+                highBoundSalaryAsText = highBoundSalaryAsText.replace('k','000');
+                highBoundSalaryAsText = highBoundSalaryAsText.trim();
+                System.debug(highBoundSalaryAsText);
+                decimalReturnValue = Decimal.valueOf(highBoundSalaryAsText);
+            }else if(matches2 == true){
+                //Matches second pattern example: $109k
+                Integer stringLength = salaryAsText.length();
+                String rawSalary = salaryAsText.replace('$','');
+                rawSalary = rawSalary.replace('k','000');
+                rawSalary = rawSalary.trim();
+                decimalReturnValue = Decimal.valueOf(rawSalary);
+
+            }else if(matches3 == true){
+                //Matches third pattern example: $50 - 60 per hour, or $50-$60 per hour
+                System.debug('Matches third pattern, i.e. $50 - $60 per hour, or $50-$60 per hour');
+                String rawSalary = salaryAsText;
+                System.debug('Raw Salary #1: ' + rawSalary);
+                //Get index of dash (-)
+                Integer dashIndex = rawSalary.indexOf('-');
+                System.debug('Dash Index: ' + dashIndex);
+                //Remove everything before the dash
+                rawSalary = rawSalary.subString(dashIndex + 1);
+                System.debug('First half removed: ' + rawSalary);
+                rawSalary = rawSalary.replace('$','');
+                System.debug('$ removed: ' + rawSalary);
+                rawSalary = rawSalary.replace('per hour','');
+                System.debug('per hour removed: ' + rawSalary);
+                rawSalary = rawSalary.trim();
+                System.debug('After Trim(): ' + rawSalary);
+                Decimal hourlyRate = Decimal.valueOf(rawSalary);  
+                decimalReturnValue = hourlyRate * 2080; //40 hours by 52 weeks
+                System.debug(decimalReturnValue);
+
+            }else if(matches4 == true){
+                //Matches fourth pattern example: $50 per hour
+                System.debug('Matches fourth pattern');
+                String rawSalary = salaryAsText;
+                rawSalary = rawSalary.replace('$','');
+                rawSalary = rawSalary.replace('/hr','');
+                rawSalary = rawSalary.trim();
+                Decimal hourlyRate = Decimal.valueOf(rawSalary);
+                decimalReturnValue = hourlyRate * 2080; //40 hours by 52 weeks
+
+            }else{
+                //Does not match any known pattern
+                decimalReturnValue = null;
+            }
+        }catch(Exception e){
+            decimalReturnValue = null;
         }
 
-        List<Matcher> matchers = new List<Matcher>();
-        for(Pattern pattern : patterns){
-            Matcher matcher = pattern.matcher(salaryAsText);
-            matchers.add(matcher);
-        }
-
-        for(Matcher matcher : matchers){
-            
-        }
-        return null;
+        return decimalReturnValue;
     }
 }
