@@ -5,7 +5,7 @@ public with sharing class JobApplicationUtils {
             request.setMethod('POST');
             request.setHeader('Content-Type', 'application/json');
             //Define the JSON payload
-            String jsonBody = '{"keywords": "Salesforce", "location": "Raleigh", "salary": 1}';
+            String jsonBody = '{"keywords": "Salesforce, Administrator, Business Analyst", "location": "", "salary": 1}';
             request.setBody(jsonBody);
             return request;
     }
@@ -92,7 +92,7 @@ public with sharing class JobApplicationUtils {
                 decimalReturnValue = Decimal.valueOf(rawSalary);
 
             }else if(matches3 == true){
-                //Matches third pattern example: $50 - 60 per hour, or $50-$60 per hour
+                //Matches third pattern example: $50 - 60 per hour, or $50-$60 per hour. Reduce to an integer then calculate yearly salary
                 System.debug('Matches third pattern, i.e. $50 - $60 per hour, or $50-$60 per hour');
                 String rawSalary = salaryAsText;
                 System.debug('Raw Salary #1: ' + rawSalary);
@@ -113,7 +113,7 @@ public with sharing class JobApplicationUtils {
                 System.debug(decimalReturnValue);
 
             }else if(matches4 == true){
-                //Matches fourth pattern example: $50 per hour
+                //Matches fourth pattern example: $50 per hour. Reduce to an integer and calculate yearly salary
                 System.debug('Matches fourth pattern');
                 String rawSalary = salaryAsText;
                 rawSalary = rawSalary.replace('$','');
