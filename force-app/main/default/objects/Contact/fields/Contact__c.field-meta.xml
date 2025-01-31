@@ -3,7 +3,6 @@
     <fullName>Contact__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
     <description>Represents a contact related to this account</description>
-    <externalId>false</externalId>
     <label>Contact</label>
     <referenceTo>Job_Application__c</referenceTo>
     <relationshipLabel>Contacts</relationshipLabel>
