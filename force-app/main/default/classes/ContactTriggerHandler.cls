@@ -31,9 +31,9 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
         for (Contact relatedContact : [SELECT Id, Job_Application__c FROM Contact WHERE Job_Application__c IN :jobApplicationIds]) {
             Id jobAppId = relatedContact.Job_Application__c;
             if (!jobApplicationContactsMap.containsKey(jobAppId)) {
-                jobApplicationContactsMap.put(jobAppId, new List<Contact>());
+                jobApplicationContactsMap.put(jobAppId, new List<Contact>()); //Add the jobAppId to the Map
             }
-            jobApplicationContactsMap.get(jobAppId).add(relatedContact);
+            jobApplicationContactsMap.get(jobAppId).add(relatedContact); //Add the relatedContactsList associatedf to the jobAppId
         }
 
         //Step 4: Assign primary contacts for each Job Application
@@ -43,8 +43,8 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
             Job_Application__c jobApp = jobApplicationMap.get(jobAppId);
 
             if(jobApp != null && jobApp.PrimaryContact__c == null && !relatedContacts.isEmpty()) {
-                //Assign the first contact as the primary contact if no Primary Contact allready
-                jobApplicationsToUpdate.add(new Job_Application__c(Id = jobAppId, PrimaryContact__c = relatedContacts[0].Id));
+                //Assign the first contact as the primary contact if no Primary Contact already
+                jobApplicationsToUpdate.add(new Job_Application__c(Id = jobAppId, PrimaryContact__c = relatedContacts[0].Id)); 
             }
         }
 
