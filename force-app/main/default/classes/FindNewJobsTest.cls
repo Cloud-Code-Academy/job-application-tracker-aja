@@ -1,7 +1,7 @@
 @isTest
 public class FindNewJobsTest {
     @isTest
-    static void testExecute() {
+    static void testParseResponse() {
         // Set up mock callout response
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
 
@@ -20,6 +20,10 @@ public class FindNewJobsTest {
         // Call the method to create job application records
         Test.startTest();
         JobApplicationUtils.createJobApplicationRecords(jobs);
+        /*if(!Test.isRunningTest()){
+            System.debug('Test.isRunningTest() is false');
+            System.enqueueJob(new FindNewJobs());
+        }*/
         Test.stopTest();
 
         List<Job_Application__c> jobApplications = [SELECT Id, Title__c, Account__c, Location__c, URL__c, Description__c, Salary__c FROM Job_Application__c];

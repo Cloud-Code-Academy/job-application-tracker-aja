@@ -166,4 +166,3 @@ public class EventTriggerHandlerTest {
         System.assert(results[2].isSuccess(), 'Valid event should succeed.');
     }
 }
-
