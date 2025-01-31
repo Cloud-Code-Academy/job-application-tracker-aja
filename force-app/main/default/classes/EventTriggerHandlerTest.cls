@@ -6,16 +6,16 @@ public class EventTriggerHandlerTest {
         // Create and insert an existing event
         Event existingEvent = new Event(
             Subject = 'Existing Event',
-            StartDateTime = DateTime.now().addDays(1),
-            EndDateTime = DateTime.now().addDays(1).addHours(1)
+            StartDateTime = DateTime.newInstance(2025, 1, 31, 10, 0, 0), // Friday
+            EndDateTime = DateTime.newInstance(2025, 1, 31, 11, 0, 0)
         );
         insert existingEvent;
 
         // Attempt to create a new overlapping event
         Event newEvent = new Event(
             Subject = 'Overlapping Event',
-            StartDateTime = DateTime.now().addDays(1).addMinutes(30),
-            EndDateTime = DateTime.now().addDays(1).addHours(1).addMinutes(30)
+            StartDateTime = DateTime.newInstance(2025, 1, 31, 10, 30, 0),
+            EndDateTime = DateTime.newInstance(2025, 1, 31, 11, 30, 0)
         );
 
         Test.startTest();
@@ -52,8 +52,8 @@ public class EventTriggerHandlerTest {
         // Insert a valid event
         Event validEvent = new Event(
             Subject = 'Valid Event',
-            StartDateTime = DateTime.now().addDays(3).addHours(9),
-            EndDateTime = DateTime.now().addDays(3).addHours(10)
+            StartDateTime = DateTime.newInstance(2025, 1, 22, 10, 0, 0),
+            EndDateTime = DateTime.newInstance(2025, 1, 22, 11, 0, 0)
         );
         insert validEvent;
 
@@ -76,22 +76,22 @@ public class EventTriggerHandlerTest {
         // Insert an existing event
         Event existingEvent = new Event(
             Subject = 'Existing Event',
-            StartDateTime = DateTime.now().addDays(3).addHours(9),
-            EndDateTime = DateTime.now().addDays(3).addHours(10)
+            StartDateTime = DateTime.newInstance(2025, 1, 31, 9, 0, 0),
+            EndDateTime = DateTime.newInstance(2025, 1, 31, 10, 0, 0)
         );
         insert existingEvent;
 
         // Insert a second event
         Event secondEvent = new Event(
             Subject = 'Second Event',
-            StartDateTime = DateTime.now().addDays(3).addHours(11),
-            EndDateTime = DateTime.now().addDays(3).addHours(12)
+            StartDateTime = DateTime.newInstance(2025, 1, 31, 11, 0, 0),
+            EndDateTime = DateTime.newInstance(2025, 1, 31, 12, 0, 0)
         );
         insert secondEvent;
 
         // Attempt to update the second event to overlap with the first
-        secondEvent.StartDateTime = DateTime.now().addDays(3).addHours(9).addMinutes(30);
-        secondEvent.EndDateTime = DateTime.now().addDays(3).addHours(10).addMinutes(30);
+        secondEvent.StartDateTime = DateTime.newInstance(2025, 1, 31, 9, 30, 0);
+        secondEvent.EndDateTime = DateTime.newInstance(2025, 1, 31, 10, 30, 0);
 
         Test.startTest();
         try {
@@ -108,14 +108,14 @@ public class EventTriggerHandlerTest {
         // Insert an existing event
         Event existingEvent = new Event(
             Subject = 'Existing Event',
-            StartDateTime = DateTime.now().addDays(3).addHours(9),
-            EndDateTime = DateTime.now().addDays(3).addHours(10)
+            StartDateTime = DateTime.newInstance(2025, 1, 31, 9, 0, 0),
+            EndDateTime = DateTime.newInstance(2025, 1, 31, 10, 0, 0)
         );
         insert existingEvent;
 
         // Update the event to a new valid time range
-        existingEvent.StartDateTime = DateTime.now().addDays(3).addHours(13);
-        existingEvent.EndDateTime = DateTime.now().addDays(3).addHours(14);
+        existingEvent.StartDateTime = DateTime.newInstance(2025, 1, 31, 11, 0, 0);
+        existingEvent.EndDateTime = DateTime.newInstance(2025, 1, 31, 12, 0, 0);
 
         Test.startTest();
         update existingEvent;
@@ -123,8 +123,8 @@ public class EventTriggerHandlerTest {
 
         // Assert no errors occurred
         Event updatedEvent = [SELECT StartDateTime, EndDateTime FROM Event WHERE Id = :existingEvent.Id];
-        System.assertEquals(DateTime.now().addDays(3).addHours(13), updatedEvent.StartDateTime);
-        System.assertEquals(DateTime.now().addDays(3).addHours(14), updatedEvent.EndDateTime);
+        System.assertEquals(DateTime.newInstance(2025, 1, 31, 11, 0, 0), updatedEvent.StartDateTime, 'Start time should be January 31, 2025, 11:00 AM');
+        System.assertEquals(DateTime.newInstance(2025, 1, 31, 12, 0, 0), updatedEvent.EndDateTime, 'End time should be January 31, 2025, 12:00 PM');
     }
 
     @isTest
@@ -132,16 +132,16 @@ public class EventTriggerHandlerTest {
         // Create and insert an existing event
         Event existingEvent = new Event(
             Subject = 'Existing Event',
-            StartDateTime = DateTime.now().addDays(2).addHours(9),
-            EndDateTime = DateTime.now().addDays(2).addHours(10)
+            StartDateTime = DateTime.newInstance(2025, 1, 31, 9, 0, 0),
+            EndDateTime = DateTime.newInstance(2025, 1, 31, 10, 0, 0)
         );
         insert existingEvent;
 
         // Attempt to create multiple events with various scenarios
         Event overlappingEvent = new Event(
             Subject = 'Overlapping Event',
-            StartDateTime = DateTime.now().addDays(2).addHours(9).addMinutes(30),
-            EndDateTime = DateTime.now().addDays(2).addHours(10).addMinutes(30)
+            StartDateTime = DateTime.newInstance(2025, 1, 31, 9, 30, 0),
+            EndDateTime = DateTime.newInstance(2025, 1, 31, 10, 30, 0)
         );
         Event weekendEvent = new Event(
             Subject = 'Weekend Event',
@@ -150,8 +150,8 @@ public class EventTriggerHandlerTest {
         );
         Event validEvent = new Event(
             Subject = 'Valid Event',
-            StartDateTime = DateTime.now().addDays(2).addHours(11),
-            EndDateTime = DateTime.now().addDays(2).addHours(12)
+            StartDateTime = DateTime.newInstance(2025, 1, 31, 11, 30, 0),
+            EndDateTime = DateTime.newInstance(2025, 1, 31, 12, 30, 0)
         );
 
         Test.startTest();
