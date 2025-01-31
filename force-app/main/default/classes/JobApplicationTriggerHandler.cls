@@ -23,47 +23,40 @@ public with sharing class JobApplicationTriggerHandler extends TriggerHandler {
             return; // No applications to process
         }
     
-        // Collect related Job Application and Account IDs
-        Set<Id> jobApplicationIds = new Set<Id>();
+        // Collect Account IDs for Job Appplications missing Primary Contact
         Set<Id> accountIds = new Set<Id>();
+        
         for (Job_Application__c jobApp : jobApplications) {
-            if (jobApp.PrimaryContact__c == null) {
-                if (jobApp.Id != null) {
-                    jobApplicationIds.add(jobApp.Id);
-                }
-                if (jobApp.Account__c != null) {
-                    accountIds.add(jobApp.Account__c);
-                }
+            if (jobApp.PrimaryContact__c == null && jobApp.Account__c != null) {
+                accountIds.add(jobApp.Account__c);
+            
             }
         }
     
-        // Return early if no relevant records
-        if (jobApplicationIds.isEmpty() && accountIds.isEmpty()) {
+        // Return early if no relevant accounts
+        if (accountIds.isEmpty()) {
             return;
         }
     
-        // Fetch related Contacts
-        Map<Id, List<Contact>> relatedContactsMap = new Map<Id, List<Contact>>();
+        // Fetch the first Contact for each account
+        Map<Id, Contact> accountToPrimaryContactMap = new Map<Id, Contact>();
         for (Contact contact : [
-            SELECT Id, Job_Application__c, AccountId
+            SELECT Id, AccountId
             FROM Contact
-            WHERE Job_Application__c IN :jobApplicationIds OR AccountId IN :accountIds
+            WHERE AccountId IN :accountIds ORDER BY CreatedDate ASC
         ]) {
-            Id relatedId = contact.Job_Application__c != null ? contact.Job_Application__c : contact.AccountId;
-            if (!relatedContactsMap.containsKey(relatedId)) {
-                relatedContactsMap.put(relatedId, new List<Contact>());
+
+            if (!accountToPrimaryContactMap.containsKey(contact.AccountId)) {
+                accountToPrimaryContactMap.put(contact.AccountId, contact);
             }
-            relatedContactsMap.get(relatedId).add(contact);
         }
-    
-        // Assign Primary Contacts
+
+        //Assign PrimaryContact__c on Job Applications
         for (Job_Application__c jobApp : jobApplications) {
-            if (jobApp.PrimaryContact__c == null) {
-                if (relatedContactsMap.containsKey(jobApp.Id) && !relatedContactsMap.get(jobApp.Id).isEmpty()) {
-                    jobApp.PrimaryContact__c = relatedContactsMap.get(jobApp.Id)[0].Id;
-                } else if (jobApp.Account__c != null && relatedContactsMap.containsKey(jobApp.Account__c)
-                         && !relatedContactsMap.get(jobApp.Account__c).isEmpty()) {
-                    jobApp.PrimaryContact__c = relatedContactsMap.get(jobApp.Account__c)[0].Id;
+            if (jobApp.PrimaryContact__c == null && jobApp.Account__c != null) {
+                Contact primaryContact = accountToPrimaryContactMap.get(jobApp.Account__c);
+                if (primaryContact != null) {
+                    jobApp.PrimaryContact__c = primaryContact.Id;
                 }
             }
         }
