@@ -1,3 +1,4 @@
+
 @isTest
 public class JobApplicationUtilsTest {
     @isTest
@@ -70,5 +71,6 @@ public class JobApplicationUtilsTest {
         Test.stopTest();
 
         System.assertEquals(null, result, 'Expected null due to exception in parsing');
+
     }
 }

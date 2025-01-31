@@ -8,3 +8,10 @@
 string tempvar = 'Enter_your_name_here';
 System.debug('Hello World!');
 System.debug('My name is ' + tempvar);
+
+
+    FindNewJobs fnj = new FindNewJobs();
+    System.enqueueJob(fnj);
+
+InterviewReminder interviewReminder = new InterviewReminder();
+Database.executeBatch(interviewReminder, 200);

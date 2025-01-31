@@ -44,19 +44,21 @@ private class JobApplicationTriggerHandlerTest {
         Job_Application__c jobApp = new Job_Application__c(Name = 'Job App 1', Account__c = account.Id);
         insert jobApp;
 
-        List<Job_Application__c> jobApps = [SELECT Id, PrimaryContact__c FROM Job_Application__c WHERE Id = :jobApp.Id];
+        List<Job_Application__c> jobApps = [SELECT Id, PrimaryContact__c, Account__c FROM Job_Application__c WHERE Id = :jobApp.Id];
 
         JobApplicationTriggerHandler handler = new JobApplicationTriggerHandler();
 
         // Act
+        
         Test.startTest();
         handler.handlePrimaryContactAssignment(jobApps);
         Test.stopTest();
-
+        
         // Assert
-        jobApps = [SELECT PrimaryContact__c FROM Job_Application__c WHERE Id = :jobApp.Id];
+        jobApps = [SELECT PrimaryContact__c, Account__c FROM Job_Application__c WHERE Id = :jobApp.Id];
         System.assertNotEquals(null, jobApps[0].PrimaryContact__c, 'Primary contact should be assigned.');
         System.assertEquals(contact1.Id, jobApps[0].PrimaryContact__c, 'The first related contact should be assigned as the primary contact.');
+        
     }
 
     @isTest

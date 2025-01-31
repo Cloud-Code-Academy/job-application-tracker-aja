@@ -11,11 +11,11 @@ public with sharing class EventTriggerHandler extends TriggerHandler {
         Set<Id> eventIds = new Set<Id>();
         List<Event> allEvents = [SELECT Id, StartDateTime, EndDateTime FROM Event WHERE Id != null];
 
-        for (Event e : events) {
-            //Skip null StartDateTime of EndDateTime - might not need this because start and end time cannot be null in Salesforce
+       for (Event e : events) {
+            /*//Skip null StartDateTime of EndDateTime - might not need this because start and end time cannot be null in Salesforce
             if (e.StartDateTime == null || e.EndDateTime == null) {
                 continue;
-            }
+            }*/
 
             //Ensure no weekend scheduling
             if (e.StartDateTime.format('E') == 'Sat' || e.StartDateTime.format('E') == 'Sun')  {
