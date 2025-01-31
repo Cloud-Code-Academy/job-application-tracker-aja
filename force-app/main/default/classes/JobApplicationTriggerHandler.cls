@@ -10,12 +10,12 @@ public with sharing class JobApplicationTriggerHandler extends TriggerHandler {
     
     //Override afterInsert to handle insert logic
     public override void afterInsert() {
-        afterInsertOrUpdate();
+        afterInsertOrUpdateForTaskCreation();
     }
 
     // Override afterUpdate to handle update logic
     public override void afterUpdate() {
-        afterInsertOrUpdate();
+        afterInsertOrUpdateForTaskCreation();
     }
 
     public void handlePrimaryContactAssignment(List<Job_Application__c> jobApplications) {
@@ -64,7 +64,7 @@ public with sharing class JobApplicationTriggerHandler extends TriggerHandler {
     
     
     //Method that handles the logic for after insert and after update
-   public void afterInsertOrUpdate() {
+   public void afterInsertOrUpdateForTaskCreation() {
 
         //List to hold job applications where status changes
         List<Job_Application__c> processedApplications = new List<Job_Application__c>();
