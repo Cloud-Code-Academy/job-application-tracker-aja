@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Location__c</fullName>
+    <description>A text/picklist field to indicate the job location or if it&apos;s remote.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>A text/picklist field to indicate the job location or if it&apos;s remote.</inlineHelpText>
+    <label>Location</label>
+    <length>255</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

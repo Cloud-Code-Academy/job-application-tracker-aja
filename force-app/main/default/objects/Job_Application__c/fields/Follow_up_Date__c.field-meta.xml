@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Follow_up_Date__c</fullName>
+    <description>A date field to specify when to follow up on the application.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Specifies when to follow up on the application.</inlineHelpText>
+    <label>Follow-up Date</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>

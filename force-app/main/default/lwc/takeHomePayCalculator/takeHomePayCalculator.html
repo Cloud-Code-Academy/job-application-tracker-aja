@@ -1,0 +1,94 @@
+<template>
+    <lightning-card>
+        <div slot="title" class="custom-title">
+            <lightning-icon
+                icon-name="custom:custom17"
+                alternative-text="Tax Calculator Icon"
+                size="medium"
+                title="Take-home Pay Calculator">
+            </lightning-icon>
+            <span class="custom-title-text"> Take-home Pay Calculator</span>
+        </div>
+
+        <div class="slds-p-around_medium">
+            <!-- Salary Input Field -->
+            <lightning-input
+                label="Enter Salary"
+                type="number"
+                value={salary}
+                placeholder="Enter your gross annual salary"
+                onchange={handleSalaryChange}
+                required>
+            </lightning-input>
+
+            <!-- Error Message for Invalid Salary or Negative Salary -->
+            <template if:true={inputError}>
+                <div class="slds-text-color_error">{inputError}</div>
+            </template>
+
+            <!-- Error Message for Negative Salary from Record -->
+            <template if:true={errorMessage}>
+                <div class="slds-text-color_error">{errorMessage}</div>
+            </template>
+
+            <!-- Salary Breakdown Table -->
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_fixed-layout">
+                <thead>
+                    <tr>
+                        <th scope="col">Category</th>
+                        <th scope="col">Weekly</th>
+                        <th scope="col">Bi-weekly</th>
+                        <th scope="col">Monthly</th>
+                        <th scope="col">Annual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template if:true={grossIncome}>
+                        <tr>
+                            <th scope="row">Gross Income</th>
+                            <td>{grossIncome.weekly}</td>
+                            <td>{grossIncome.biweekly}</td>
+                            <td>{grossIncome.monthly}</td>
+                            <td>{grossIncome.annual}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Social Security Tax</th>
+                            <td>{taxes.socialSecurity.weekly}</td>
+                            <td>{taxes.socialSecurity.biweekly}</td>
+                            <td>{taxes.socialSecurity.monthly}</td>
+                            <td>{taxes.socialSecurity.annual}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Medicare Tax</th>
+                            <td>{taxes.medicare.weekly}</td>
+                            <td>{taxes.medicare.biweekly}</td>
+                            <td>{taxes.medicare.monthly}</td>
+                            <td>{taxes.medicare.annual}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Federal Income Tax</th>
+                            <td>{taxes.federal.weekly}</td>
+                            <td>{taxes.federal.biweekly}</td>
+                            <td>{taxes.federal.monthly}</td>
+                            <td>{taxes.federal.annual}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Total Taxes</th>
+                            <td>{totalTaxes.weekly}</td>
+                            <td>{totalTaxes.biweekly}</td>
+                            <td>{totalTaxes.monthly}</td>
+                            <td>{totalTaxes.annual}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Net Income</th>
+                            <td>{netIncome.weekly}</td>
+                            <td>{netIncome.biweekly}</td>
+                            <td>{netIncome.monthly}</td>
+                            <td>{netIncome.annual}</td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+    </lightning-card>
+</template>

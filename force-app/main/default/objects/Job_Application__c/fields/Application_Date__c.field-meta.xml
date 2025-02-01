@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Application_Date__c</fullName>
+    <description>A date field to record the date when the application was submitted.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>The date when the application was submitted.</inlineHelpText>
+    <label>Application Date</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>
