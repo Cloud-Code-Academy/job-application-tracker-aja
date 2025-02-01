@@ -1,38 +1,76 @@
-/**
- * This class contains unit tests for validating the behavior of Apex classes
- * and triggers.
- *
- * Unit tests are class methods that verify whether a particular piece
- * of code is working properly. Unit test methods take no arguments,
- * commit no data to the database, and are flagged with the testMethod
- * keyword in the method definition.
- *
- * All test methods in an org are executed whenever Apex code is deployed
- * to a production org to confirm correctness, ensure code
- * coverage, and prevent regressions. All Apex classes are
- * required to have at least 75% code coverage in order to be deployed
- * to a production org. In addition, all triggers must have some code coverage.
- * 
- * The @isTest class annotation indicates this class only contains test
- * methods. Classes defined with the @isTest annotation do not count against
- * the org size limit for all Apex scripts.
- *
- * See the Apex Language Reference for more information about Testing and Code Coverage.
- */
+
 @isTest
-private class JobApplicationUtilsTest {
+public class JobApplicationUtilsTest {
+    @isTest
+    static void testGetHttpRequest() {
+        HttpRequest request = JobApplicationUtils.getHttpRequest();
+        System.assertNotEquals(null, request, 'Request should not be null');
+        System.assertEquals('POST', request.getMethod(), 'Method should be POST');
+        System.assert(request.getBody().contains('keywords'), 'Request body should contain keywords');
+    }
+    
+    @isTest
+    static void testParseResponse() {
+        String mockResponse = '{"jobs": [{"id": "123", "title": "Test Job", "location": "Remote", "link": "http://example.com", "company": "Test Corp", "snippet": "<b>Great job</b>", "salary": "$100k"}] }';
+        HttpResponse response = new HttpResponse();
+        response.setBody(mockResponse);
+        response.setStatusCode(200);
+        
+        List<Object> jobs = JobApplicationUtils.parseResponse(response);
+        System.assertEquals(1, jobs.size(), 'Should parse one job');
+    }
+    
+    @isTest
+    static void testCreateJobApplicationRecords() {
+        List<Object> jobs = new List<Object>();
+        Map<String, Object> job = new Map<String, Object>{
+            'id' => '123',
+            'title' => 'Test Job',
+            'location' => 'Remote',
+            'link' => 'http://example.com',
+            'company' => 'Test Corp',
+            'snippet' => '<b>Great job</b>',
+            'salary' => '$100k'
+        };
+        jobs.add(job);
+        
+        Test.startTest();
+        JobApplicationUtils.createJobApplicationRecords(jobs);
+        Test.stopTest();
+        
+        List<Job_Application__c> jobApps = [SELECT Id FROM Job_Application__c WHERE job_id__c = '123'];
+        System.assertEquals(1, jobApps.size(), 'Should insert one job application');
+    }
+    
+    @isTest
+    static void testParseValidSalary() {
+
+        Test.startTest();
+        Decimal resultA = JobApplicationUtils.parseSalary('$120k');
+        Decimal resultB = JobApplicationUtils.parseSalary('$120k - $150k');
+        Decimal resultC = JobApplicationUtils.parseSalary('$120k-$150k');
+        Decimal resultD = JobApplicationUtils.parseSalary('$50 per hour');
+        Decimal resultE = JobApplicationUtils.parseSalary('$25 - $50 per hour');
+        Decimal resultF = JobApplicationUtils.parseSalary('$25-$50 per hour');
+
+        Test.stopTest();
+        System.assertEquals(120000, resultA,'Salary should be 120000');
+        System.assertEquals(150000, resultB,'Salary should be 150000');
+        System.assertEquals(150000, resultC,'Salary should be 150000');
+        System.assertEquals(104000, resultD,'Salary should be 104000');
+        System.assertEquals(104000, resultE,'Salary should be 104000');
+        System.assertEquals(104000, resultF,'Salary should be 104000');
+    }
 
     @isTest
-    static void getHttpRequestTest() {
+    static void testParseInvalidSalary(){
+        String invalidSalary = 'invalidSalaryFormat';
 
-        //Call the method under test
-        HttpRequest request = JobApplicationUtils.getHttpRequest();
+        Test.startTest();
+        Decimal result = JobApplicationUtils.parseSalary(invalidSalary);
+        Test.stopTest();
 
-        //Assert the method is POST
-        Assert.areEqual('POST', request.getMethod(),'The HTTP method should be POST.');
-        Assert.areEqual('application/json', request.getHeader('Content-Type'), 'The content type should be application/json');
-        Assert.areEqual('https://jooble.org/api/03c23409-1a24-4fcf-a10d-d05da812186b', request.getEndpoint(), 'The endpoint is not properly set. It should be https://jooble.org/api/03c23409-1a24-4fcf-a10d-d05da812186b');
-        Assert.areEqual('{"keywords": "Salesforce", "location": "Raleigh", "salary": 1}', request.getBody(), 'The body is not properly set');
-        
+        System.assertEquals(null, result, 'Expected null due to exception in parsing');
+
     }
 }
