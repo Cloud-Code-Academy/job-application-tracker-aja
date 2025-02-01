@@ -14,8 +14,4 @@
         <field>Min__c</field>
         <value xsi:type="xsd:double">100526.0</value>
     </values>
-    <values>
-        <field>Tax_Rate__c</field>
-        <value xsi:type="xsd:double">24.0</value>
-    </values>
 </CustomMetadata>
