@@ -1,12 +1,5 @@
-public with sharing class FindNewJobs implements Queueable, Schedulable, Database.AllowsCallouts {
-
-    public void execute(SchedulableContext context){
-        System.enqueueJob(this);
-    }
-
-
+public with sharing class FindNewJobsQueueable implements Queueable, Database.AllowsCallouts{
     public void execute(QueueableContext context){
-        
         try{
             Http http = new Http();
             //Get the request
