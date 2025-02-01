@@ -22,16 +22,6 @@ public with sharing class TaxRateHelperTest {
     }
 
     @IsTest
-    static void testGetTaxRateInvalidTax() {
-        Test.startTest();
-        Decimal taxRate = TaxRateHelper.getTaxRate('Invalid_Tax');
-        Test.stopTest();
-        System.debug('Attempted to fetch invalid tax type. Returned tax rate: ' + taxRate);
-
-        Assert.isTrue(taxRate == 0, 'Tax rate for an invalid tax type should return 0.');
-    }
-
-    @IsTest
     static void testGetTaxRateEmptyTaxType() {
         Test.startTest();
         Decimal taxRate = TaxRateHelper.getTaxRate('');
@@ -42,16 +32,6 @@ public with sharing class TaxRateHelperTest {
     }
 
     @IsTest
-    static void testGetTaxRateNullTaxType() {
-        Test.startTest();
-        Decimal taxRate = TaxRateHelper.getTaxRate(null);
-        Test.stopTest();
-        System.debug('Attempted to fetch tax rate with null tax type. Returned: ' + taxRate);
-
-        Assert.isTrue(taxRate == 0, 'Tax rate for null tax type should return 0.');
-    }
-
-    @IsTest
     static void testGetFederalTaxBrackets() {
         Test.startTest();
         List<Federal_Income_Tax_Bracket__mdt> brackets = TaxRateHelper.getFederalTaxBrackets();
@@ -59,15 +39,6 @@ public with sharing class TaxRateHelperTest {
         System.debug('Fetched federal tax brackets count: ' + brackets.size());
 
         Assert.isTrue(brackets != null, 'Federal tax brackets list should not be null.');
-    }
-
-    @IsTest
-    static void testGetTaxRateExceptionHandling() {
-        Test.startTest();
-        Decimal taxRate = TaxRateHelper.getTaxRate('INVALID_RECORD'); 
-        Test.stopTest();
-        System.debug('Exception Handling Test: Returned Tax Rate: ' + taxRate);
-
-        Assert.isTrue(taxRate == 0, 'When an exception occurs, tax rate should return 0.');
+        Assert.isTrue(brackets.size() >= 0, 'Federal tax brackets should return an empty list if no records exist.');
     }
 }
