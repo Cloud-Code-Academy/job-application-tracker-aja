@@ -1,11 +1,29 @@
 public without sharing class InterviewReminder implements Database.Batchable<sObject>{        
     //Step 1: Get events that are scheduled tomorrow and related to job application records       
     public Database.QueryLocator start(Database.BatchableContext bc){
+        //Determine the next business day
+        Date today = Date.today();
+        Date startOfWeek = today.toStartOfWeek();
+        Integer dayNumber = startOfWeek.daysBetween(today);
+        String nextBusinessDay = 'NEXT_N_DAYS:1';
+        
+        switch on dayNumber {
+            when 0,1,2,3,4 {
+                //do nothing
+            }
+            when 5{
+                nextBusinessDay = 'NEXT_N_DAYS:3';
+            }
+            when 6{
+                nextBusinessDay = 'NEXT_N_DAYS:2';
+            }
+        }
+
         string query =  'SELECT ' +
                         'Id, ' +
                         'Owner.Email, OwnerId, Owner.FirstName,' +
                         'WhoId,' +
-                        'WhatId, Location, StartDateTime, EndDateTime, Type FROM Event WHERE DAY_ONLY(StartDateTime) = NEXT_N_DAYS:2'; 
+                        'WhatId, Location, StartDateTime, EndDateTime, Type FROM Event WHERE DAY_ONLY(StartDateTime) = ' + nextBusinessDay; 
         return Database.getQueryLocator(query);
     }
     //Step 2: Collect Job Application IDs
