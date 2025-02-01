@@ -1,6 +1,6 @@
-public with sharing class StaleJobApplicationDailyCleanup implements Database.Batchable<sObject>{
-    public StaleJobApplicationDailyCleanup() {
-
+public with sharing class StaleJobApplicationDailyCleanup implements Database.Batchable<sObject>, Schedulable{
+    public void execute(SchedulableContext context){
+        System.enqueueJob(this);
     }
     public Database.QueryLocator start(Database.BatchableContext bc){
         String query = 'SELECT Id FROM Job_Application__c WHERE Follow_up_Date__c < N_DAYS_AGO:30 AND (Status__c != \'Closed\' AND Status__c != \'Accepted\')';
