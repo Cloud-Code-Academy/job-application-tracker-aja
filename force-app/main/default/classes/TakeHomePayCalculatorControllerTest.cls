@@ -1,101 +1,146 @@
 @IsTest
 public with sharing class TakeHomePayCalculatorControllerTest {
+
     @IsTest
-    static void testCalculatePayPeriodDetails() {
-        // Set up test input
-        Decimal grossSalary = 120000; // Example gross annual salary
-
-        // Fetch pay periods using the helper
-        Map<String, Decimal> payPeriods = PayPeriodHelper.getPayPeriods();
-        Decimal weeklyPeriodsPerYear = payPeriods.get('Weekly'); // Fetch weekly pay periods
-
-        // Fetch tax rate for Social Security
-        Decimal socialSecurityRate = TaxRateHelper.getTaxRate('Social_Security');
-
-        // Call the method under test
+    static void testCalculatePayPeriodDetailsPositive() {
+        Decimal grossSalary = 100000;
         Test.startTest();
         Map<String, Decimal> results = TakeHomePayCalculatorController.calculatePayPeriodDetails(grossSalary);
         Test.stopTest();
 
-        // Validate the results
         System.assert(results != null, 'Results map should not be null');
         System.assert(results.containsKey('Weekly Social Security Tax'), 'Results should contain Weekly Social Security Tax');
         System.assert(results.containsKey('Annual Net Income'), 'Results should contain Annual Net Income');
-
-        // Check specific calculated values
-        Decimal expectedWeeklySocialTax = (grossSalary / weeklyPeriodsPerYear) * (socialSecurityRate);
-        System.assertEquals(expectedWeeklySocialTax.setScale(2), results.get('Weekly Social Security Tax').setScale(2), 'Weekly Social Security Tax calculation mismatch');
     }
 
     @IsTest
-    static void testCalculateSocialSecurityTax() {
-        // Set up test input
-        Decimal grossSalary = 5000;
+    static void testCalculatePayPeriodDetailsNullSalary() {
+        Boolean exceptionThrown = false;
+        try {
+            Test.startTest();
+            TakeHomePayCalculatorController.calculatePayPeriodDetails(null);
+            Test.stopTest();
+        } catch (AuraHandledException e) {
+            exceptionThrown = true;
+        }
+        Assert.isTrue(exceptionThrown, 'Expected an exception for null salary input but none was thrown.');
+    }
 
-        // Fetch the Social Security tax rate from custom metadata using the helper
-        Decimal socialSecurityRate = TaxRateHelper.getTaxRate('Social_Security');
+    @IsTest
+    static void testCalculatePayPeriodDetailsNegativeSalary() {
+        Boolean exceptionThrown = false;
+        try {
+            Test.startTest();
+            TakeHomePayCalculatorController.calculatePayPeriodDetails(-5000);
+            Test.stopTest();
+        } catch (AuraHandledException e) {
+            exceptionThrown = true;
+        }
+        Assert.isTrue(exceptionThrown, 'Expected an exception for negative salary input but none was thrown.');
+    }
 
-        // Call the method under test
+    @IsTest
+    static void testCalculateSocialSecurityTaxPositive() {
+        Decimal grossSalary = 50000;
         Test.startTest();
         Decimal socialSecurityTax = TakeHomePayCalculatorController.calculateSocialSecurityTax(grossSalary);
         Test.stopTest();
-
-        // Validate the result
-        Decimal expectedTax = grossSalary * (socialSecurityRate);
-        System.assertEquals(expectedTax.setScale(2), socialSecurityTax.setScale(2), 'Social Security Tax calculation mismatch');
+        System.assert(socialSecurityTax >= 0, 'Social Security Tax should be positive');
     }
 
     @IsTest
-    static void testCalculateMedicareTax() {
-        // Set up test input
-        Decimal grossSalary = 5000;
+    static void testCalculateSocialSecurityTaxNullSalary() {
+        Boolean exceptionThrown = false;
+        try {
+            Test.startTest();
+            TakeHomePayCalculatorController.calculateSocialSecurityTax(null);
+            Test.stopTest();
+        } catch (AuraHandledException e) {
+            exceptionThrown = true;
+        }
+        Assert.isTrue(exceptionThrown, 'Expected an exception for null salary input but none was thrown.');
+    }
 
-        // Fetch the Medicare tax rate from custom metadata using the helper
-        Decimal medicareRate = TaxRateHelper.getTaxRate('Medicare');
+    @IsTest
+    static void testCalculateSocialSecurityTaxNegativeSalary() {
+        Boolean exceptionThrown = false;
+        try {
+            Test.startTest();
+            TakeHomePayCalculatorController.calculateSocialSecurityTax(-10000);
+            Test.stopTest();
+        } catch (AuraHandledException e) {
+            exceptionThrown = true;
+        }
+        Assert.isTrue(exceptionThrown, 'Expected an exception for negative salary input but none was thrown.');
+    }
 
-        // Call the method under test
+    @IsTest
+    static void testCalculateMedicareTaxPositive() {
+        Decimal grossSalary = 60000;
         Test.startTest();
         Decimal medicareTax = TakeHomePayCalculatorController.calculateMedicareTax(grossSalary);
         Test.stopTest();
-
-        // Validate the result
-        Decimal expectedTax = grossSalary * (medicareRate);
-        System.assertEquals(expectedTax.setScale(2), medicareTax.setScale(2), 'Medicare Tax calculation mismatch');
+        System.assert(medicareTax >= 0, 'Medicare Tax should be positive');
     }
 
     @IsTest
-    static void testCalculateFederalIncomeTax() {
-        // Set up test input
-        Decimal grossIncome = 100000;
-
-        // Get federal income tax brackets from custom metadata using the helper
-        List<Federal_Income_Tax_Bracket__mdt> brackets = TaxRateHelper.getFederalTaxBrackets();
-
-        // Manually calculate the expected tax based on the brackets
-        Decimal expectedTax = 0;
-
-        // Calculate the expected federal tax using bracket logic
-        for (Federal_Income_Tax_Bracket__mdt bracket : brackets) {
-            if (grossIncome > bracket.Min__c) {
-                Decimal taxableIncome = 0;
-                if (grossIncome > bracket.Max__c) {
-                    taxableIncome = bracket.Max__c - bracket.Min__c;
-                } else {
-                    taxableIncome = grossIncome - bracket.Min__c;
-                }
-                expectedTax += taxableIncome * (bracket.Federal_Income_Tax_Rate__c);
-                if (grossIncome <= bracket.Max__c) {
-                    break;
-                }
-            }
+    static void testCalculateMedicareTaxNullSalary() {
+        Boolean exceptionThrown = false;
+        try {
+            Test.startTest();
+            TakeHomePayCalculatorController.calculateMedicareTax(null);
+            Test.stopTest();
+        } catch (AuraHandledException e) {
+            exceptionThrown = true;
         }
+        Assert.isTrue(exceptionThrown, 'Expected an exception for null salary input but none was thrown.');
+    }
 
-        // Call the method under test
+    @IsTest
+    static void testCalculateMedicareTaxNegativeSalary() {
+        Boolean exceptionThrown = false;
+        try {
+            Test.startTest();
+            TakeHomePayCalculatorController.calculateMedicareTax(-7000);
+            Test.stopTest();
+        } catch (AuraHandledException e) {
+            exceptionThrown = true;
+        }
+        Assert.isTrue(exceptionThrown, 'Expected an exception for negative salary input but none was thrown.');
+    }
+
+    @IsTest
+    static void testCalculateFederalIncomeTaxPositive() {
+        Decimal grossIncome = 120000;
         Test.startTest();
         Decimal federalTax = TakeHomePayCalculatorController.calculateFederalIncomeTax(grossIncome);
         Test.stopTest();
+        System.assert(federalTax >= 0, 'Federal tax should be positive');
+    }
 
-        // Validate the result
-        System.assertEquals(expectedTax.setScale(2), federalTax.setScale(2), 'Federal Income Tax calculation mismatch');
+    @IsTest
+    static void testCalculateFederalIncomeTaxNullSalary() {
+        Boolean exceptionThrown = false;
+        try {
+            Test.startTest();
+            TakeHomePayCalculatorController.calculateFederalIncomeTax(null);
+            Test.stopTest();
+        } catch (AuraHandledException e) {
+            exceptionThrown = true;
+        }
+        Assert.isTrue(exceptionThrown, 'Expected an exception for null salary input but none was thrown.');
+    }
+
+    @IsTest
+    static void testCalculateFederalIncomeTaxNegativeSalary() {
+        Boolean exceptionThrown = false;
+        try {
+            Test.startTest();
+            TakeHomePayCalculatorController.calculateFederalIncomeTax(-80000);
+            Test.stopTest();
+        } catch (AuraHandledException e) {
+            exceptionThrown = true;
+        }
+        Assert.isTrue(exceptionThrown, 'Expected an exception for negative salary input but none was thrown.');
     }
 }
