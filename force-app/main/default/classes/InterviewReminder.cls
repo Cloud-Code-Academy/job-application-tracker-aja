@@ -1,6 +1,15 @@
-public without sharing class InterviewReminder implements Database.Batchable<sObject>{        
-    //Step 1: Get events that are scheduled tomorrow and related to job application records       
+public without sharing class InterviewReminder implements Database.Batchable<sObject>, Schedulable{        
+    
+    // Implement the execute method required by the Schedulable interface
+    public void execute(SchedulableContext sc) {
+        InterviewReminder batchJob = new InterviewReminder();
+        // Run the batchable with a batch size of 200
+        Database.executeBatch(batchJob, 200);
+        }
+
+    //Bathable Step 1: Get events that are scheduled tomorrow and related to job application records       
     public Database.QueryLocator start(Database.BatchableContext bc){
+        
         //Determine the next business day
         Date today = Date.today();
         Date startOfWeek = today.toStartOfWeek();
@@ -19,6 +28,7 @@ public without sharing class InterviewReminder implements Database.Batchable<sOb
             }
         }
 
+        //Get events scheduled on the next business day
         string query =  'SELECT ' +
                         'Id, ' +
                         'Owner.Email, OwnerId, Owner.FirstName,' +
@@ -26,7 +36,7 @@ public without sharing class InterviewReminder implements Database.Batchable<sOb
                         'WhatId, Location, StartDateTime, EndDateTime, Type FROM Event WHERE DAY_ONLY(StartDateTime) = ' + nextBusinessDay; 
         return Database.getQueryLocator(query);
     }
-    //Step 2: Collect Job Application IDs
+    //Batchable Step 2: Collect Job Application IDs
     public Set<Id> getJobApplicationIds(List<Event> scope){
          Set<Id> jobApplicationIdset = new Set<Id>();
          for(Event evt : scope){
@@ -34,7 +44,7 @@ public without sharing class InterviewReminder implements Database.Batchable<sOb
          }
          return jobApplicationIdSet;
     }
-    //Step 3: Map relationship between Job Application and Account Name
+    //Batchable Step 3: Map relationship between Job Application and Account Name
     public Map<Id, String> mapJobApplicationsToAccount(Set<Id> jobApplicationIdSet){  
         Map<Id, String> jobApplicationToAccountNameMap = new Map<Id, String>();
         String query =  'SELECT Id, Account__r.Name ' +
@@ -47,7 +57,7 @@ public without sharing class InterviewReminder implements Database.Batchable<sOb
         }
         return jobApplicationToAccountNameMap;
     }
-    //Step 4: Prepare emails
+    //Batchable Step 4: Prepare emails
     public List<Messaging.SingleEmailMessage> prepareEmails(List<Event> scope, Map<Id, String> jobApplicationToAccountNameMap){
         List<Messaging.SingleEmailMessage> emails = new List<Messaging.SingleEmailMessage>();
         for(Event s : scope){
@@ -88,13 +98,13 @@ public without sharing class InterviewReminder implements Database.Batchable<sOb
         }
         return emails;
     }
-    //Step 5: Send emails
+    //Batchable Step 5: Send emails
     public void sendInterviewReminderEmails(List<Messaging.SingleEmailMessage> emails){
         if(!emails.isEmpty()){
             Messaging.sendEmail(emails);
         }
     }
-    //Execute steps 2 to 6
+    //Batchable Step 6: Execute steps 2 to 5
     public void execute(Database.BatchableContext bc, List<Event> scope){
         try{
             if(!scope.isEmpty()){
@@ -107,6 +117,7 @@ public without sharing class InterviewReminder implements Database.Batchable<sOb
             System.debug(e.getMessage());
         }
     }
+    //Batchable Step 7: Retrieve job info and send to administrator
     public void finish(Database.BatchableContext bc){
         // Get the ID of the AsyncApexJob representing this batch job
         // from Database.BatchableContext.
