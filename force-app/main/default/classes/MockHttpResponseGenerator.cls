@@ -1,5 +1,5 @@
 // Mock class for HTTP 
-@isTest     
+@isTest   
 public class MockHttpResponseGenerator implements HttpCalloutMock {
     public HTTPResponse respond(HTTPRequest req) {
         HttpResponse res = new HttpResponse();
