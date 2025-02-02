@@ -13,11 +13,12 @@ private class StaleJobApplicationDailyCleanupTest {
     }
     @isTest
     static void StaleJobCleanupTest(){
-        System.assertEquals(1, [SELECT COUNT() FROM Job_Application__c WHERE Follow_up_Date__c < N_DAYS_AGO:30],'There should be one job application with a follow up date more than 30 days in the past');
         Test.startTest();
         StaleJobApplicationDailyCleanup doomedJobs = new StaleJobApplicationDailyCleanup();
         Database.executeBatch(doomedJobs,200);
         Test.stopTest();
-        System.assertEquals(0, [SELECT COUNT() FROM Job_Application__c WHERE Follow_up_Date__c < N_DAYS_AGO:30],'There should be no job applications with a follow up date more than 30 days in the past');
+        List<Job_Application__c> jobs = [SELECT Status__c, Notes__c FROM Job_Application__c];
+        System.assertEquals('Closed', jobs[0].Status__c,'Status should be closed');
+        System.assertEquals('Closed by an automated process', jobs[0].Notes__c, 'Notes field should indicate record status changed to closed by an automated process');
     }
 }

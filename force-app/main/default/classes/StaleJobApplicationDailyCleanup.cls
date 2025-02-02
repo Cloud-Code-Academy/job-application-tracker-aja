@@ -8,26 +8,16 @@ public with sharing class StaleJobApplicationDailyCleanup implements Database.Ba
     }
 
     public void execute(Database.BatchableContext bc, List<Job_Application__c> scope){
-        delete scope;
+        List<Job_Application__c> jobsToUpdate = new List<Job_Application__c>();
+        for(Job_Application__c job : scope){
+            job.Status__c = 'Closed';
+            job.Notes__c = 'Closed by an automated process';
+            jobsToUpdate.add(job);
+        }
+        update jobsToUpdate;
     }
 
     public void finish(Database.BatchableContext bc){
-        // Get the ID of the AsyncApexJob representing this batch job
-        // from Database.BatchableContext.
-        // Query the AsyncApexJob object to retrieve the current job's information.
-        AsyncApexJob a = 
-            [SELECT Id, Status, NumberOfErrors, JobItemsProcessed,
-            TotalJobItems, CreatedBy.Email
-            FROM AsyncApexJob WHERE Id = :bc.getJobId()];
-
-        // Send an email to the Apex job's submitter notifying of job completion.
-        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-        String[] toAddresses = new String[] {a.CreatedBy.Email};
-        mail.setToAddresses(toAddresses);
-        mail.setSubject('Apex Sharing Recalculation ' + a.Status);
-        mail.setPlainTextBody
-        ('The batch Apex job processed ' + a.TotalJobItems +
-        ' batches with '+ a.NumberOfErrors + ' failures.');
-        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
+       //To do: send email to user who called method
     }
 }
