@@ -1,7 +1,15 @@
+/**
+ * @description Handles logic for sending reminder emails
+ * @author Jonathan Lyles
+ * @createc 2025-01-31
+ */
+
 public without sharing class InterviewReminder implements Database.Batchable<sObject>, Schedulable{        
     
-    // Implement the execute method required by the Schedulable interface
-    public void execute(SchedulableContext sc) {
+    /**
+     * @description      Implement the execute method required by the Schedulable interface
+     */
+     public void execute(SchedulableContext sc) {
         InterviewReminder batchJob = new InterviewReminder();
         // Run the batchable with a batch size of 200
         Database.executeBatch(batchJob, 200);
