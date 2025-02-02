@@ -44,21 +44,33 @@ public without sharing class InterviewReminder implements Database.Batchable<sOb
          }
          return jobApplicationIdSet;
     }
-    //Batchable Step 3: Map relationship between Job Application and Account Name
-    public Map<Id, String> mapJobApplicationsToAccount(Set<Id> jobApplicationIdSet){  
-        Map<Id, String> jobApplicationToAccountNameMap = new Map<Id, String>();
-        String query =  'SELECT Id, Account__r.Name ' +
+    //Batchable Step 3: Query values needed to build maps
+    public List<Job_Application__c> getJobApplicationList(Set<Id> jobApplicationIdSet){
+        String query =  'SELECT Id, Name, Account__r.Name ' +
                         'FROM Job_Application__c ' +
                         'WHERE Id ' +
                         'IN :jobApplicationIdSet';
-        List<Job_Application__c> relatedAccounts = Database.query(query);
-        for(Job_Application__c relatedAccount : relatedAccounts){
-            jobApplicationToAccountNameMap.put(relatedAccount.Id,relatedAccount.Account__r.Name);
+        List<Job_Application__c> jobAppList = Database.query(query);
+        return jobAppList;
+    } 
+    //Batchable Step 4: Map relationship between Job Application and Account Name
+    public Map<Id, String> mapJobApplicationsToAccount(List<Job_Application__c> jobAppList){  
+        Map<Id, String> jobApplicationToAccountNameMap = new Map<Id, String>();
+        for(Job_Application__c jobApp : jobAppList){
+            jobApplicationToAccountNameMap.put(jobApp.Id, jobApp.Account__r.Name);
         }
         return jobApplicationToAccountNameMap;
     }
-    //Batchable Step 4: Prepare emails
-    public List<Messaging.SingleEmailMessage> prepareEmails(List<Event> scope, Map<Id, String> jobApplicationToAccountNameMap){
+    //Batchable Step 5: Map Job Application Id to Job Application Name
+    public Map<Id, String> mapJobApplicationIdToJobApplicationName(List<Job_Application__c> jobAppList){
+        Map<Id, String> jobApplicationIdToJobApplicationNameMap = new Map<Id, String>();
+        for(Job_Application__c jobApp : jobAppList){
+            jobApplicationIdToJobApplicationNameMap.put(jobApp.Id, jobApp.Name);
+        }
+        return jobApplicationIdToJobApplicationNameMap;
+    }
+    //Batchable Step 6: Prepare emails
+    public List<Messaging.SingleEmailMessage> prepareEmails(List<Event> scope, Map<Id, String> jobApplicationToAccountNameMap, Map<Id, String> jobApplicationIdToJobApplicationNameMap ){
         List<Messaging.SingleEmailMessage> emails = new List<Messaging.SingleEmailMessage>();
         for(Event s : scope){
             if (s.OwnerId != null && s.Owner.Email != null) {
@@ -75,14 +87,14 @@ public without sharing class InterviewReminder implements Database.Batchable<sOb
                                 '</head>' +
                             '<body>' +
                                 '<p>Dear ' + s.Owner.FirstName + ',</p>' +
-                                '<p>This is a reminder about your upcoming interview for the ' +
-                                '<strong>' + jobApplicationToAccountNameMap.get(s.Id) + '</strong> position at ' +
-                                '<strong>' + s.Location + '</strong>.</p>' +
+                                '<p>This is a reminder about your upcoming interview for the ' + jobApplicationIdToJobApplicationNameMap.get(s.WhatId) + 
+                                ' position at '+
+                                '<strong>' + jobApplicationToAccountNameMap.get(s.WhatId) + '</strong>' +
                                 '<p><strong>Details:</strong></p>' +
                                 '<ul>' +
-                                    '<li><strong>Date:</strong> ' + s.StartDateTime.date() + '</li>' +
+                                    '<li><strong>Date:</strong> ' + s.StartDateTime.date().format() + '</li>' +
                                     '<li><strong>Time:</strong> ' + s.StartDateTime.format('hh:mm a') + '</li>' +
-                                    '<li><strong>Location:</strong> ' + s.Location + '</li>' +
+                                    (s.Location != null ? '<li><strong>Location:</strong> ' + s.Location + '</li>' : '') +
                                 '</ul>' +
                                 '<p>Best regards,</p>' +
                                 '<p>AJA Recruitment Team</p>' +
@@ -98,20 +110,37 @@ public without sharing class InterviewReminder implements Database.Batchable<sOb
         }
         return emails;
     }
-    //Batchable Step 5: Send emails
+    //Batchable Step 7: Send emails
     public void sendInterviewReminderEmails(List<Messaging.SingleEmailMessage> emails){
         if(!emails.isEmpty()){
-            Messaging.sendEmail(emails);
+            List<Messaging.SendEmailResult> emailResults =  Messaging.sendEmail(emails, FALSE);
+            for(Messaging.SendEmailResult emailResult : emailResults){
+                System.debug(emailResult.isSuccess());
+            }
         }
     }
-    //Batchable Step 6: Execute steps 2 to 5
+    //Batchable Step 6: Execute steps 2 to 7
     public void execute(Database.BatchableContext bc, List<Event> scope){
         try{
             if(!scope.isEmpty()){
-                Set<Id> jobApplicationIds = this.getJobApplicationIds(scope); //Step 2
-                Map<Id, String> jobApplicationToAccountNameMap = this.mapJobApplicationsToAccount(jobApplicationIds); //Step 3
-                List<Messaging.SingleEmailMessage> emailList = this.prepareEmails(scope, jobApplicationToAccountNameMap); //Step 4
-                this.sendInterviewReminderEmails(emailList); //Step 5
+                //Step 2
+                System.debug('Scope is not empty');
+                Set<Id> jobApplicationIds = this.getJobApplicationIds(scope); 
+                System.debug('Job Application Ids: ' + jobApplicationIds);
+                //Step 3
+                List<Job_Application__c> jobsList = this.getJobApplicationList(jobApplicationIds);
+                System.debug('jobsList: ' + jobsList );
+                //Step 4
+                Map<Id, String> jobApplicationToAccountNameMap = this.mapJobApplicationsToAccount(jobsList); 
+                System.debug(jobApplicationToAccountNameMap);
+                //Step 5
+                Map<Id, String> jobApplicationToJobApplicationNameMap = this.mapJobApplicationIdToJobApplicationName(jobsList);
+                System.debug(jobApplicationToJobApplicationNameMap);
+                //Step 6
+                List<Messaging.SingleEmailMessage> emailList = this.prepareEmails(scope, jobApplicationToAccountNameMap, jobApplicationToJobApplicationNameMap); 
+                System.debug(emailList);
+                //Step 7
+                this.sendInterviewReminderEmails(emailList);
             }
         }catch (Exception e){
             System.debug(e.getMessage());
@@ -119,21 +148,6 @@ public without sharing class InterviewReminder implements Database.Batchable<sOb
     }
     //Batchable Step 7: Retrieve job info and send to administrator
     public void finish(Database.BatchableContext bc){
-        // Get the ID of the AsyncApexJob representing this batch job
-        // from Database.BatchableContext.
-        // Query the AsyncApexJob object to retrieve the current job's information.
-        AsyncApexJob a = 
-            [SELECT Id, Status, NumberOfErrors, JobItemsProcessed,
-            TotalJobItems, CreatedBy.Email
-            FROM AsyncApexJob WHERE Id = :bc.getJobId()];
-        // Send an email to the Apex job's submitter notifying of job completion.
-        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-        String[] toAddresses = new String[] {a.CreatedBy.Email};
-        mail.setToAddresses(toAddresses);
-        mail.setSubject('Apex Sharing Recalculation ' + a.Status);
-        mail.setPlainTextBody
-        ('The batch Apex job processed ' + a.TotalJobItems +
-        ' batches with '+ a.NumberOfErrors + ' failures.');
-        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
+      //send email to job requester with job results
     }
 }

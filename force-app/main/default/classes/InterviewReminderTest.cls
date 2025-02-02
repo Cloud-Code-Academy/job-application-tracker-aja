@@ -19,7 +19,7 @@ private class InterviewReminderTest {
          InterviewReminder batchJob = new InterviewReminder();
          
          // Run the batchable with a batch size of 1
-         Database.executeBatch(batchJob, 1);
+         Database.executeBatch(batchJob, 200);
         
           
         Test.stopTest();
