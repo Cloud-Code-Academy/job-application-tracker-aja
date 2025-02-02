@@ -1,4 +1,13 @@
+/**
+ * @description This is a helper class with methods needed to create new job application records
+ * @author Jonathan Lyles
+ * @created 2025-01-31
+ */
 public with sharing class JobApplicationUtils {
+    /**
+     * @description Creates and returns the HttpRequest object
+     * @return HttpRequest
+     */
     public static HttpRequest getHttpRequest(){
             HttpRequest request = new HttpRequest();
             request.setEndpoint('https://jooble.org/api/03c23409-1a24-4fcf-a10d-d05da812186b');
@@ -9,7 +18,11 @@ public with sharing class JobApplicationUtils {
             request.setBody(jsonBody);
             return request;
     }
-
+    /**
+     * @description Parses the response into a list of jobs
+     * @param HttpResponse
+     * @return List<Object>
+     */
     public static List<Object> parseResponse(HttpResponse response){
 
         //Parse the JSON string into a Map
@@ -18,6 +31,10 @@ public with sharing class JobApplicationUtils {
         List<Object> jobs = (List<Object>) parsedResponse.get('jobs');
         return jobs;
     }
+    /**
+     * @description Creates job application records
+     * @param List<Object> jobs The list of jobs returned from parseResponse()
+     */
     public static void createJobApplicationRecords(List<Object> jobs){
         //List of job applications that will be added
         List<Job_Application__c> jobApplicationsList = new List<Job_Application__c>();
@@ -98,10 +115,14 @@ public with sharing class JobApplicationUtils {
         }
     }
 
-    
+    /**
+     * @description Converts the salary string returned from the API call into a numeric value representing annual salary
+     * @param salaryAsText The salary returned in the JSON response
+     * @return Decimal The salary as a numeric value representing the annual salary of the job application
+     */
     @testVisible private static Decimal parseSalary(String salaryAsText){
 
-        System.debug('Salary as text: ' + salaryAsText);
+        //System.debug('Salary as text: ' + salaryAsText);
         Decimal decimalReturnValue;
         
         //First pattern example: $109k - $120k, or $109k-$120k
@@ -123,7 +144,7 @@ public with sharing class JobApplicationUtils {
         try{
             if(matches1 == true){
                 //Matches first pattern example: $109k - $120k. Take the high bound and transform into an integer
-                System.debug('Matches first pattern');
+                //System.debug('Matches first pattern');
                 Integer stringLength = salaryAsText.length();
                 Integer indexOfDash = salaryAsText.indexOf('-');
                 String highBoundSalaryAsText = salaryAsText.right(stringLength - indexOfDash);
@@ -131,7 +152,7 @@ public with sharing class JobApplicationUtils {
                 highBoundSalaryAsText = highBoundSalaryAsText.replace('$','');
                 highBoundSalaryAsText = highBoundSalaryAsText.replace('k','000');
                 highBoundSalaryAsText = highBoundSalaryAsText.trim();
-                System.debug(highBoundSalaryAsText);
+                //System.debug(highBoundSalaryAsText);
                 decimalReturnValue = Decimal.valueOf(highBoundSalaryAsText);
             }else if(matches2 == true){
                 //Matches second pattern example: $109k
@@ -143,7 +164,7 @@ public with sharing class JobApplicationUtils {
 
             }else if(matches3 == true){
                 //Matches third pattern example: $50 - 60 per hour, or $50-$60 per hour. Reduce to an integer then calculate yearly salary
-                System.debug('Matches third pattern, i.e. $50 - $60 per hour, or $50-$60 per hour');
+                //System.debug('Matches third pattern, i.e. $50 - $60 per hour, or $50-$60 per hour');
                 String rawSalary = salaryAsText;
                 //Get index of dash (-)
                 Integer dashIndex = rawSalary.indexOf('-');
@@ -158,7 +179,7 @@ public with sharing class JobApplicationUtils {
 
             }else if(matches4 == true){
                 //Matches fourth pattern example: $50 per hour. Reduce to an integer and calculate yearly salary
-                System.debug('Matches fourth pattern');
+                //System.debug('Matches fourth pattern');
                 String rawSalary = (String) salaryAsText;
                 rawSalary = rawSalary.replace('$','');
                 rawSalary = rawSalary.replace('per hour','');
@@ -173,7 +194,6 @@ public with sharing class JobApplicationUtils {
         }catch(Exception e){
             decimalReturnValue = null;
         }
-
         return decimalReturnValue;
     }
 }
