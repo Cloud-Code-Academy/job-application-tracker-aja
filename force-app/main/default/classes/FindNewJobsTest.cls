@@ -10,7 +10,6 @@ public class FindNewJobsTest {
         Test.startTest();
         // Schedule the job execution
         FindNewJobsSchedulable scheduler = new FindNewJobsSchedulable();
-        System.debug('line 13' + scheduler);
         scheduler.execute(null); //simulating execution from the scheduler
         Test.stopTest();
 
@@ -39,7 +38,6 @@ public class FindNewJobsTest {
         // Verify details of the created record
         Job_Application__c jobApp = jobApplications[0];
         System.assertEquals('Test Job', jobApp.Title__c, 'Job title should be "Test Job"');
-        //System.assertEquals('Test Corp', jobApp.Account__c, 'Company should be "Test Corp"');
         System.assertEquals('Remote', jobApp.Location__c, 'Location should be "Remote"');
         System.assertEquals('http://example.com', jobApp.URL__c, 'Job link should be "http://example.com"');
         System.assertEquals('Great job', jobApp.Description__c, 'Snippet should be "Great job"');
