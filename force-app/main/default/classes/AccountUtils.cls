@@ -1,5 +1,16 @@
+/**
+ * @description This class handles business logic for the account object
+ * @author Jonathan Lyles
+ * @created 2024-01-31
+ */
 public with sharing class AccountUtils {
     public static Id getOrCreateAccount(String accountName){
+        /**
+         * @description Gets account if it exists, or creates account if it does not
+         * @param accountName The name of the account to check
+         * @return Id The Id of the account that was retrieved or created 
+         */
+
         if(accountName != null){
             Account relatedAccount = new Account();
             try{
