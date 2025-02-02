@@ -1,5 +1,14 @@
+/**
+ * @description This class tests FindNewJobsSchedulable and FindNewJobQueueable and ensures the job is request to find new jobs successfully retrieves and create new job application records
+ * @author Jonathan Lyles
+ * @created 2025-01-31
+ */
+
 @isTest
 public class FindNewJobsTest {
+    /**
+     * @description Tests queueable job was successfully enqueued
+     */
     
     @isTest
     static void testFindNewJobsScheduler() {
@@ -16,7 +25,9 @@ public class FindNewJobsTest {
         // Verify that the queueable job was enqueued
         System.assert(true, 'Queueable job should have been enqueued');
     }
-
+    /**
+     * @description Tests if queueable job correctly created a new job application record
+     */
     @isTest
     static void testFindNewJobsQueueable() {
         // Set up mock callout response
@@ -33,9 +44,10 @@ public class FindNewJobsTest {
             FROM Job_Application__c
         ];
         
+        // Assert: Verifies the correct number of job applications was created
         System.assertEquals(1, jobApplications.size(), 'One job application record should be created');
 
-        // Verify details of the created record
+        // Assert: Verifies details of the created record
         Job_Application__c jobApp = jobApplications[0];
         System.assertEquals('Test Job', jobApp.Title__c, 'Job title should be "Test Job"');
         System.assertEquals('Remote', jobApp.Location__c, 'Location should be "Remote"');
