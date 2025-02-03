@@ -5,11 +5,21 @@
 		<name>CustomApplication</name>
 	</types>
 	<types>
+		<members>Federal_Income_Tax_Bracket__mdt.Federal_Income_Tax_Rate__c</members>
+		<members>Federal_Income_Tax_Bracket__mdt.Max__c</members>
+		<members>Federal_Income_Tax_Bracket__mdt.Min__c</members>
+		<members>Pay_Period__mdt.Periods_Per_Year__c</members>
+		<members>Tax_Rate__mdt.Tax_Rate_Decimal__c</members>
+		<name>CustomField</name>
+	</types>
+	<types>
+		<members>*</members>
+		<name>CustomMetadata</name>
+	</types>
+	<types>
 		<members>Account</members>
 		<members>Contact</members>
-		<members>Event</members>
 		<members>Job_Application__c</members>
-		<members>Task</members>
 		<name>CustomObject</name>
 	</types>
 	<types>
@@ -31,22 +41,11 @@
 		<members>Contact.MyContacts</members>
 		<members>Contact.NewLastWeek</members>
 		<members>Contact.NewThisWeek</members>
-		<members>Event.MyRecentEvents</members>
-		<members>Event.MyRecentEvents</members>
-		<members>Event.MyUpcomingEvents</members>
-		<members>Event.MyUpcomingEvents</members>
-		<members>Event.TodaysAgenda</members>
-		<members>Event.TodaysAgenda</members>
 		<members>Job_Application__c.Accepted_Jobs</members>
 		<members>Job_Application__c.All</members>
 		<members>Job_Application__c.Final_Stage_Job_Applications</members>
 		<members>Job_Application__c.Job_Applications_in_Process</members>
 		<members>Job_Application__c.Saved_Job_Applications</members>
-		<members>Task.CompletedTasks</members>
-		<members>Task.OpenTasks</members>
-		<members>Task.OverdueTasks</members>
-		<members>Task.TodaysTasks</members>
-		<members>Task.UnscheduledTasks</members>
 		<name>ListView</name>
 	</types>
 	<types>
@@ -73,5 +72,4 @@
 		<name>Workflow</name>
 	</types>
 	<version>62.0</version>
-	
-</Package> 
+</Package>
