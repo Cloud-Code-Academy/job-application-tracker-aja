@@ -4,7 +4,7 @@
  * @created 2025-01-31
  */
 
-public with sharing class FindNewJobsQueuable implements Queueable, Database.AllowsCallouts {
+public with sharing class FindNewJobsQueueable implements Queueable, Database.AllowsCallouts {
     
     /**
      * @description Executes the queueable job
