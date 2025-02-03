@@ -1,111 +1,75 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
- 
-  <types>
-    <members>Pay_Period.Annual</members>
-    <members>Pay_Period.Monthly</members>
-    <members>Pay_Period.Bi_weekly</members>
-    <members>Pay_Period.Weekly</members>
-    <name>CustomMetadata</name>
-</types>
-
- <types>
-    <members>Tax_Rate.Social_Security</members>
-    <members>Tax_Rate.Medicare</members>
-    <name>CustomMetadata</name>
-</types>
-<types>
-    <members>Federal_Income_Tax_Bracket.Bracket10</members>
-    <members>Federal_Income_Tax_Bracket.Bracket12</members>
-    <members>Federal_Income_Tax_Bracket.Bracket22</members>
-    <members>Federal_Income_Tax_Bracket.Bracket24</members>
-    <members>Federal_Income_Tax_Bracket.Bracket32</members>
-    <members>Federal_Income_Tax_Bracket.Bracket35</members>
-    <members>Federal_Income_Tax_Bracket.Bracket37</members>
-    <name>CustomMetadata</name>
-</types> <!-- Retrieve all custom objects -->
-  <types>
-    <members>Pay_Period__mdt</members>
-    <members>Tax_Rate__mdt</members>
-    <members>Federal___Income__Tax__Bracket__mdt</members>
-    <name>CustomObject</name>
-  </types>
-
-  <!-- Retrieve specific standard objects (Account, Contact, Opportunity) -->
-  <types>
-    <members>Account</members>
-    <members>Contact</members>
-    <members>Opportunity</members>
-    <members>Event</members>
-    <name>CustomObject</name>
-  </types>
-
-  <!-- Retrieve all custom fields -->
-  <types>
-    <members>Account.*</members>
-    <members>Contact.*</members>
-    <members>Opportunity.*</members>
-    <members>Event.*</members>
-    <members>*__c</members>
-    <name>CustomField</name>
-  </types>
-
-  <!-- Retrieve layouts -->
-  <types>
-    <members>Account*</members>
-    <members>Contact-*</members>
-    <members>Opportunity-*</members>
-    <members>Event-*</members>
-    <members>*-*</members>
-    <name>Layout</name>
-  </types>
-
-  <!-- Retrieve validation rules -->
-  <types>
-    <members>Account.*</members>
-    <members>Contact.*</members>
-    <members>Opportunity.*</members>
-     <members>Event.*</members>
-    <members>*</members>
-    <name>ValidationRule</name>
-  </types>
-
-  <!-- Retrieve list views -->
-  <types>
-    <members>Account.*</members>
-    <members>Contact.*</members>
-    <members>Opportunity.*</members>
-    <members>Event.*</members>
-    <members>*</members>
-    <name>ListView</name>
-  </types>
-
-  <!-- Retrieve record types -->
-  <types>
-    <members>Account.*</members>
-    <members>Contact.*</members>
-    <members>Opportunity.*</members>
-     <members>Event.*</members>
-    <members>*</members>
-    <name>RecordType</name>
-  </types>
-
-  <!-- Retrieve workflows (includes rules, alerts, etc.) -->
-  <types>
-    <members>Account</members>
-    <members>Contact</members>
-    <members>Opportunity</members>
-      <members>Event</members>
-    <members>*</members>
-    <name>Workflow</name>
-  </types>
-
-  <types>
-
-  <members>*</members>
-  <name>CustomMetadata</name>
-</types>
-
-  <!-- Set the API version to match your Salesforce Org -->
-  <version>58.0</version>
+	<types>
+		<members>Job_Application_Tracker</members>
+		<name>CustomApplication</name>
+	</types>
+	<types>
+		<members>Federal_Income_Tax_Bracket__mdt.Federal_Income_Tax_Rate__c</members>
+		<members>Federal_Income_Tax_Bracket__mdt.Max__c</members>
+		<members>Federal_Income_Tax_Bracket__mdt.Min__c</members>
+		<members>Pay_Period__mdt.Periods_Per_Year__c</members>
+		<members>Tax_Rate__mdt.Tax_Rate_Decimal__c</members>
+		<name>CustomField</name>
+	</types>
+	<types>
+		<members>*</members>
+		<name>CustomMetadata</name>
+	</types>
+	<types>
+		<members>Account</members>
+		<members>Contact</members>
+		<members>Job_Application__c</members>
+		<name>CustomObject</name>
+	</types>
+	<types>
+		<members>Account-Account Layout</members>
+		<members>Contact-Contact Layout</members>
+		<members>Job_Application__c-Job Application Layout</members>
+		<name>Layout</name>
+	</types>
+	<types>
+		<members>Account.AllAccounts</members>
+		<members>Account.MyAccounts</members>
+		<members>Account.NewLastWeek</members>
+		<members>Account.NewThisWeek</members>
+		<members>Activity.AllActivities</members>
+		<members>Activity.MyActivities</members>
+		<members>Activity.TodaysTasks</members>
+		<members>Activity.UpcomingEvents</members>
+		<members>Contact.AllContacts</members>
+		<members>Contact.MyContacts</members>
+		<members>Contact.NewLastWeek</members>
+		<members>Contact.NewThisWeek</members>
+		<members>Job_Application__c.Accepted_Jobs</members>
+		<members>Job_Application__c.All</members>
+		<members>Job_Application__c.Final_Stage_Job_Applications</members>
+		<members>Job_Application__c.Job_Applications_in_Process</members>
+		<members>Job_Application__c.Saved_Job_Applications</members>
+		<name>ListView</name>
+	</types>
+	<types>
+		<members>*</members>
+		<name>PathAssistant</name>
+	</types>
+	<types>
+		<members>Job Application Tracker User</members>
+		<name>Profile</name>
+	</types>
+	<types>
+		<members>Account.*</members>
+		<members>Contact.*</members>
+		<members>Event.*</members>
+		<members>Opportunity.*</members>
+		<name>RecordType</name>
+	</types>
+	<types>
+		<members>Job_Application__c.PreventNegativeSalary</members>
+		<name>ValidationRule</name>
+	</types>
+	<types>
+		<members>*</members>
+		<name>Workflow</name>
+	</types>
+	<version>62.0</version>
 </Package>
