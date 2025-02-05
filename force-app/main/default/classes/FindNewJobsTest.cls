@@ -22,8 +22,16 @@ public class FindNewJobsTest {
         scheduler.execute(null); //simulating execution from the scheduler
         Test.stopTest();
 
+            // Verify that a Queueable job was enqueued
+        AsyncApexJob job = [SELECT Id, Status, JobType 
+        FROM AsyncApexJob 
+        WHERE JobType = 'Queueable'
+        ORDER BY CreatedDate DESC 
+        LIMIT 1];
+
         // Verify that the queueable job was enqueued
-        System.assert(true, 'Queueable job should have been enqueued');
+        System.assertNotEquals(null, job, 'Expected a Queueable job to be enqueued');
+        System.assert(job.Status == 'Queued' || job.Status == 'Processing', 'Queueable job should be enqueued or processing');
     }
     /**
      * @description Tests if queueable job correctly created a new job application record
