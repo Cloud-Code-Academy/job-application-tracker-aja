@@ -104,11 +104,7 @@ public with sharing class JobApplicationUtils {
             Decimal parsedSalary = JobApplicationUtils.parseSalary(salary);
             jobApp.Salary__c = parsedSalary;
             jobApp.job_id__c = String.valueOf(job.get('id'));
-
-
-            String companyName = (String) job.get('company');
-            //This is an inner loop and needs to be fixed
-            jobApp.Account__c = AccountUtils.getOrCreateAccount(companyName);
+            jobApp.CompanyNameFromHttpResponse__c = (String) job.get('company');
             jobApplicationsList.add(jobApp);
             count++; //increment the counter
         }
