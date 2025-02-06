@@ -109,6 +109,15 @@ public with sharing class JobApplicationUtils {
     }
 
     /**
+     * @description This method handles the logic for assigning a value to Account__c field for Job_Application__c records
+     * @param List<Job_Application__c> List of Job_Application__c records returned from JobApplicationUtils.CreateJobApplicationRecords()
+     * @return Id - The Id of the account which was retrieved or created
+     */
+    @testVisible private static void updateJobApplicationAccountField(List<Job_Application__c> jobList){
+        
+    }
+
+    /**
      * @description Converts the salary string returned from the API call into a numeric value representing annual salary
      * @param salaryAsText The salary returned in the JSON response
      * @return Decimal The salary as a numeric value representing the annual salary of the job application
