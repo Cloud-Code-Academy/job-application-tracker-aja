@@ -56,8 +56,6 @@ public with sharing class JobApplicationUtils {
             duplicateExternalIds.add(dup.job_id__c);
         }
 
-        //Initialize a counter. Max 10 records per request
-        Integer count = 0;
         //Iterate over each job, which is an inner map in the 'jobs' list
         for(Object jobObj : jobs){
             
