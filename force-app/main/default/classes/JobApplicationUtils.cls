@@ -114,7 +114,9 @@ public with sharing class JobApplicationUtils {
      * @return Id - The Id of the account which was retrieved or created
      */
     @testVisible private static void updateJobApplicationAccountField(List<Job_Application__c> jobList){
+        List<Job_Application__c> jobApplicationsToUpdate = new List<Job_Application__c>();
         
+
     }
 
     /**
