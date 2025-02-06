@@ -60,10 +60,7 @@ public with sharing class JobApplicationUtils {
         Integer count = 0;
         //Iterate over each job, which is an inner map in the 'jobs' list
         for(Object jobObj : jobs){
-            if(count >= 10){
-                break; //Stop iterating after 10 jobs
-            }
-
+            
             Map<String, Object> job = (Map<String, Object>) jobObj;
             Job_Application__c jobApp = new Job_Application__c();
 
@@ -106,7 +103,7 @@ public with sharing class JobApplicationUtils {
             jobApp.job_id__c = String.valueOf(job.get('id'));
             jobApp.CompanyNameFromHttpResponse__c = (String) job.get('company');
             jobApplicationsList.add(jobApp);
-            count++; //increment the counter
+            
         }
         if(!jobApplicationsList.isEmpty()){
             insert jobApplicationsList;
