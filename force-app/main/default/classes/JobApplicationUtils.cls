@@ -32,42 +32,55 @@ public with sharing class JobApplicationUtils {
         return jobs;
     }
     /**
+     * @description This method builds a list of external IDs that will be used to check for duplicates
+     * @param List<Object>jobs
+     * @return List<String>
+     */
+    public static List<String> getExternalJobApplicationIds(List<Object> jobs){
+        List<String> externalIds = new List<String>();
+        //Build a list of each job's external Id. To be used later to prevent duplicate records
+            for(Object jobObj : jobs){
+                Map<String, Object> job = (Map<String, Object>) jobObj;
+                String externalId = String.valueOf(job.get('id'));
+                externalIds.add(externalId);
+        }
+        return externalIds;
+    }
+    /**
+     * @description This method removes job applications from the list where the external Id is already in the database
+     * @param List<String>
+     * @return List<String>
+     */
+    public static List<String> removeExternalJobApplicationDuplicateIds(List<String> externalIds){
+        //Check to see which records already exist
+        List<Job_Application__c> duplicateRecords = [SELECT job_id__c FROM Job_Application__c WHERE job_id__c IN :externalIds];
+        //Create a list of duplicate external Ids
+        List<String> duplicateExternalIds = new List<String>();
+        for(Job_Application__c duplicateRecord : duplicateRecords){
+            duplicateExternalIds.add(duplicateRecord.job_id__c);
+        }
+        //Remove duplicateExternalIds from externalIds
+        for(String duplicateExternalId : duplicateExternalIds){
+            if(externalIds.contains(duplicateExternalId)){
+                Integer indexInList = externalIds.indexOf(duplicateExternalId);
+                externalIds.remove(indexInList);
+            }
+        }
+        return externalIds;
+    }
+    /**
      * @description Creates job application records
      * @param List<Object> jobs The list of jobs returned from parseResponse()
      */
-    public static void createJobApplicationRecords(List<Object> jobs){
+    public static List<Job_Application__c> createJobApplicationRecords(List<Object> jobs){
         //List of job applications that will be added
         List<Job_Application__c> jobApplicationsList = new List<Job_Application__c>();
-
-        List<String> externalIds = new List<String>();
-
-       //Build a list of each job's external Id. To be used later to prevent duplicate records
-        for(Object jobObj : jobs){
-            Map<String, Object> job = (Map<String, Object>) jobObj;
-            String externalId = String.valueOf(job.get('id'));
-            externalIds.add(externalId);
-        }
-
-        //Check to see which records already exist
-        List<Job_Application__c> duplicateJobsList = [SELECT job_id__c FROM Job_Application__c WHERE job_id__c IN :externalIds];
-        //Reduce to a list of job_id__c values
-        List<String> duplicateExternalIds = new List<String>();
-        for(Job_Application__c dup : duplicateJobsList){
-            duplicateExternalIds.add(dup.job_id__c);
-        }
 
         //Iterate over each job, which is an inner map in the 'jobs' list
         for(Object jobObj : jobs){
             
             Map<String, Object> job = (Map<String, Object>) jobObj;
             Job_Application__c jobApp = new Job_Application__c();
-
-            
-            //Is the job already in the database?
-            if(duplicateExternalIds.contains(String.valueOf(job.get('id')))){
-                System.debug('Duplicate record found');
-                continue; //go to the next job
-            }
 
             jobApp.Name = (String) job.get('title');
             jobApp.Title__c = (String) job.get('title');
@@ -106,18 +119,23 @@ public with sharing class JobApplicationUtils {
         if(!jobApplicationsList.isEmpty()){
             insert jobApplicationsList;
         }
+        return jobApplicationsList;
     }
 
     /**
-     * @description This method handles the logic for assigning a value to Account__c field for Job_Application__c records
+     * @description Creates a map of job application Ids to Account Ids
      * @param List<Job_Application__c> List of Job_Application__c records returned from JobApplicationUtils.CreateJobApplicationRecords()
-     * @return Id - The Id of the account which was retrieved or created
+     * return Map<Id,Id> - Job Application Id to Account Id
      */
-    @testVisible private static void updateJobApplicationAccountField(List<Job_Application__c> jobList){
-        List<Job_Application__c> jobApplicationsToUpdate = new List<Job_Application__c>();
+    @testVisible private static void updateJobApplicationAccountField(List<Job_Application__c> jobApplications){
+        Map<Id, Id> JobApplicationIdToAccountId = new Map<Id, Id>();
+
+
+
         
 
     }
+    
 
     /**
      * @description Converts the salary string returned from the API call into a numeric value representing annual salary
