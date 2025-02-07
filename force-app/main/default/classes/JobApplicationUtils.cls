@@ -88,7 +88,6 @@ public with sharing class JobApplicationUtils {
             JobApp.Url__c = (String) job.get('link');
             jobApp.Status__c = 'Saved';
 
-            
              // Clean Job Description Snippet of HTML tags and entities and set jobApp job description field
             String rawSnippet = (String) job.get('snippet');
 
@@ -107,12 +106,10 @@ public with sharing class JobApplicationUtils {
             // Set the cleaned description
             jobApp.Description__c = cleanedSnippet;
 
-            String salary = (String) job.get('salary');
-            
+            String salary = (String) job.get('salary');            
             Decimal parsedSalary = JobApplicationUtils.parseSalary(salary);
             jobApp.Salary__c = parsedSalary;
             jobApp.job_id__c = String.valueOf(job.get('id'));
-            jobApp.CompanyNameFromHttpResponse__c = (String) job.get('company');
             jobApplicationsList.add(jobApp);
             
         }
@@ -121,22 +118,26 @@ public with sharing class JobApplicationUtils {
         }
         return jobApplicationsList;
     }
-
-    /**
-     * @description Creates a map of job application Ids to Account Ids
-     * @param List<Job_Application__c> List of Job_Application__c records returned from JobApplicationUtils.CreateJobApplicationRecords()
-     * return Map<Id,Id> - Job Application Id to Account Id
+       /**
+     * @description Creates a map of the job application id and their company names
+     * @param List<Job_Application__c> List of inserted job application records
+     * @return Map<Id, String>
      */
-    @testVisible private static void updateJobApplicationAccountField(List<Job_Application__c> jobApplications){
-        Map<Id, Id> JobApplicationIdToAccountId = new Map<Id, Id>();
-
-
-
-        
-
+    public static Map<Id, String> createJobApplicationIdToCompanyNameMap(List<Job_Application__c> jobApplicationList){
+        Map<Id, String> jobApplicationToCompanyNameMap = new Map<Id, String>();
+        for(Job_Application__c jobApplication : jobApplicationList){
+            try{
+                if(jobApplication.CompanyNameFromHttpResponse__c != null){
+                    jobApplicationToCompanyNameMap.put(jobApplication.Id, jobApplication.CompanyNameFromHttpResponse__c);
+                }else{
+                    jobApplicationToCompanyNameMap.put(jobApplication.Id, null);
+                }
+            }catch (Exception e) {
+                jobApplicationToCompanyNameMap.put(jobApplication.Id, null);
+            }
+        }
+        return JobApplicationToCompanyNameMap;
     }
-    
-
     /**
      * @description Converts the salary string returned from the API call into a numeric value representing annual salary
      * @param salaryAsText The salary returned in the JSON response
