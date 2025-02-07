@@ -4,29 +4,30 @@
  * @created 2025-01-31
  */
 public with sharing class AccountUtils {
-    public static Id getOrCreateAccount(String accountName){
+    public static Map<Id,Id> createJobApplicationIdToAccountIdMap (Map<Id, String> jobApplicationIdToAccountNameMap){
         /**
          * @description Gets account if it exists, or creates account if it does not
-         * @param accountName The name of the account to check
-         * @return Id The Id of the account that was retrieved or created 
+         * @param jobApplicationIdToAccountNameMap
+         * @return Map<Id, Id> Id of the job application to Id of the account 
          */
-
-        if(accountName != null){
-            Account relatedAccount = new Account();
-            try{
-                Account getAccount = [SELECT Id FROM Account WHERE Name = :accountName LIMIT 1];
-                    if(getAccount != null){
-                    relatedAccount = getAccount;
+        try{
+            // The map that this method will return
+            Map<Id, Id> JobApplicationIdToAccountIdMap = new Map<Id, Id>();
+            // Create a list of accounts that exist
+            List<Account> accList =[SELECT Id FROM Account WHERE Name IN :jobApplicationIdToAccountNameMap.values()];
+            // Map Account Names to Ids
+            Map<String, Id> accountNameToIdMap = new Map<String, Id>();
+            for(Account acc : accList){
+                if(acc.Name != null){
+                    accountNameToIdMap.put(acc.Name, acc.Id);
                 }
-            }catch(Exception e){
-                System.debug('Account does not exist');
-                Account createAccount = new Account();
-                createAccount.Name = accountName;
-                insert createAccount;
-                relatedAccount = createAccount;            
             }
-            return relatedAccount.Id;
-        }else{
+            // Create the job application id to EXISTING account Id map
+            for(Id jobApplicationId : jobApplicationIdToAccountNameMap.keySet()){
+                jobApplicationIdToAccountIdMap.put(jobApplicationId, accountNameToIdMap.get(jobApplicationIdToAccountNameMap.get(jobApplicationId)));
+            }
+            return JobApplicationIdToAccountIdMap;
+        }catch(Exception e){
             return null;
         }
     }
