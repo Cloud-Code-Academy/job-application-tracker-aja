@@ -3,44 +3,10 @@
  * @author Jonathan Lyles
  * @created 2025-01-31
  */
-
- /**
-  * Execution Flow:
-  * Step 1: FindNewJobsSchedulable's execute method calls System.enqueueJob(new FindNewJobsQueueable());
-            FindNewJobsQueueable's execute method: Gets HttpRequest()
-  * Step 2: FindNewJobsQueueable: Sends HttpRequest
-  * Step 3: FindNewJobsQueueable: Receives HttpResponse
-  * Step 4: FindNewJobsQueueable: Checks HttpResponse code.
-        - If response code is 200:
-            * Calls JobApplicationUtils.parseReponse(HttpResponse response)
-    Step 5: JobApplicationUtils.parseResponse()
-        - Deserializes JSON string
-        - Returns List<Object> jobs
-  * Step 6: JobApplicationUtils.getExternalJobApplicationId(List<Object> jobs)
-        - Returns List<String> externalIds
-  * Step 7: JobApplicaitonUtils.removeExternalJobApplicationDuplicateIds(List<String> externalIds)
-        - Remove any duplicates and returns the list List<String> externalIds
-  * Step 8: JobApplicationUtils.removeDuplicateObjects(List<Object> jobs, List<String> externalsIds)
-        - Remove jobs in jobs where its Id is not in externalIds
-        - Returns List<Object> jobsCleaned
-  * Step 9: JobApplicationUtils.createJobApplicationRecords(List<Object> jobsCleaned)
-        - Creates the job application records, which includes parsing the text, salary, etc
-        - Call parseSalary() to parse salary.
-        - Returns List<Job_Application__c> jobApplicationsList - the records created
-  * Step 10: JobApplicationUtils.createJobApplicationIdToCompanyNameMap(List<Job_Application__c> jobApplicationList)
-        - Returns Map<Id, String> of Job_Application__c Ids to company name map
-  * Step 11: AccountUtils.createJobApplicationIdToAccountIdMap(Map<Id, String> jobApplicationIdToAccountNameMap)
-        - For Accounts that exist, add the Ids to the map
-        - For Accounts that do not exist, create them, get their Ids, and add them to the map
-        - Returns Map<Id, Id> - Map of Job Application Id to Account Id
-    Step 12: JobApplicationUtils.insertAccounts (List<Job_Application__c> jobApps, Map<Id, Id> jobAppToAccountMap )
-        - Updates the Account__c field for the job application records
-        - returns void
-  */
 public with sharing class JobApplicationUtils {
     /**
      * @description Creates and returns the HttpRequest object
-     * @return HttpRequest
+     * @return HttpRequest object that will be sent
      */
     public static HttpRequest getHttpRequest(){
             HttpRequest request = new HttpRequest();
@@ -54,8 +20,8 @@ public with sharing class JobApplicationUtils {
     }
     /**
      * @description Parses the response into a list of jobs
-     * @param HttpResponse
-     * @return List<Object>
+     * @param HttpResponse response - The response from the callout
+     * @return List<Object> - The JSON string deserialized into a list of objects
      */
     public static List<Object> parseResponse(HttpResponse response){
         //System.debug('response: ' + response.getBody());
@@ -68,8 +34,8 @@ public with sharing class JobApplicationUtils {
     }
     /**
      * @description This method builds a list of external IDs that will be used to check for duplicates
-     * @param List<Object>jobs
-     * @return List<String>
+     * @param List<Object> jobs - The List<Object> that was deserialized in parseResponse()
+     * @return List<String> externalIds - represent external ids of the job applications
      */
     public static List<String> getExternalJobApplicationIds(List<Object> jobs){
         List<String> externalIds = new List<String>();
@@ -79,24 +45,21 @@ public with sharing class JobApplicationUtils {
                 String externalId = String.valueOf(job.get('id'));
                 externalIds.add(externalId);
         }
-        //System.debug('Size of externalIds: ' + externalIds.size());
         return externalIds;
     }
     /**
      * @description This method removes job applications from the list where the external Id is already in the database
-     * @param List<String>
-     * @return List<String>
+     * @param List<String> externalIds (Raw)
+     * @return List<String> externalIds (Cleaned)
      */
     public static List<String> removeExternalJobApplicationDuplicateIds(List<String> externalIds){
         //Check to see which records already exist
         List<Job_Application__c> duplicateRecords = [SELECT job_id__c FROM Job_Application__c WHERE job_id__c IN :externalIds];
-        //System.debug('Duplicate records: ' + duplicateRecords);
         //Create a list of duplicate external Ids
         List<String> duplicateExternalIds = new List<String>();
         for(Job_Application__c duplicateRecord : duplicateRecords){
             duplicateExternalIds.add(duplicateRecord.job_id__c);
         }
-        //System.debug('Size of duplicateExternalIds: ' + duplicateExternalIds.size());
         //Remove duplicateExternalIds from externalIds
         for(String duplicateExternalId : duplicateExternalIds){
             if(externalIds.contains(duplicateExternalId)){
@@ -104,8 +67,6 @@ public with sharing class JobApplicationUtils {
                 externalIds.remove(indexInList);
             }
         }
-        //System.debug('Size of externalIds with duplicates removed: ' + externalIds.size());
-        //System.debug('Contents of externalIds: ' + externalIds);
         return externalIds;
     }
     /**
@@ -132,13 +93,10 @@ public with sharing class JobApplicationUtils {
     public static List<Job_Application__c> createJobApplicationRecords(List<Object> jobsCleaned){
         //List of job applications that will be added
         List<Job_Application__c> jobApplicationsList = new List<Job_Application__c>();
-
         //Iterate over each job, which is an inner map in the 'jobs' list
-        for(Object jobObj : jobsCleaned){
-            
+        for(Object jobObj : jobsCleaned){    
             Map<String, Object> job = (Map<String, Object>) jobObj;
             Job_Application__c jobApp = new Job_Application__c();
-
             jobApp.Title__c = (String) job.get('title');
             jobApp.Location__c = (String) job.get('location');
             JobApp.Url__c = (String) job.get('link');
@@ -146,7 +104,7 @@ public with sharing class JobApplicationUtils {
             //Hidden field
             jobApp.CompanyNameFromHttpResponse__c = (String) job.get('company');
 
-             // Clean Job Description Snippet of HTML tags and entities and set jobApp job description field
+            // Clean Job Description Snippet of HTML tags and entities and set jobApp job description field
             String rawSnippet = (String) job.get('snippet');
 
             // Remove HTML tags
@@ -237,7 +195,7 @@ public with sharing class JobApplicationUtils {
                 decimalReturnValue = Decimal.valueOf(highBoundSalaryAsText);
             }else if(matches2 == true){
                 //Matches second pattern example: $109k
-                Integer stringLength = salaryAsText.length();
+                //Integer stringLength = salaryAsText.length();
                 String rawSalary = salaryAsText.replace('$','');
                 rawSalary = rawSalary.replace('k','000');
                 rawSalary = rawSalary.trim();
