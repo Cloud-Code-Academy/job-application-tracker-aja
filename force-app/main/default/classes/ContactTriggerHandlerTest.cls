@@ -19,10 +19,10 @@ public class ContactTriggerHandlerTest {
         insert contact2;
 
         // Create Job Applications
-        Job_Application__c jobApp1 = new Job_Application__c(Name = 'Job App 1', Account__c = account1.Id);
+        Job_Application__c jobApp1 = new Job_Application__c(Title__c = 'Job App 1', Account__c = account1.Id);
         insert jobApp1;
 
-        Job_Application__c jobApp2 = new Job_Application__c(Name = 'Job App 2');
+        Job_Application__c jobApp2 = new Job_Application__c(Title__c = 'Job App 2');
         insert jobApp2;
     }
 

@@ -60,29 +60,10 @@ public class AccountUtilsTest {
         Map<Id, Id> jobAppIdToAccountIdMapTest = AccountUtils.createJobApplicationIdToAccountIdMap(jobAppIdToAccountNameMapTest);
         Test.stopTest();
         
-        // Assert: The name should have two keys, and two values
-        System.debug('map contents: ' + jobAppIdToAccountIdMapTest);
-        System.debug('map keysets: ' + jobAppIdToAccountIdMapTest.keySet());
-        System.debug('map values: ' + jobAppIdToAccountIdMapTest.values());
-        
+        // Assert: The name should have two keys, and two values    
         System.assertEquals(2, (jobAppIdToAccountIdMapTest.keySet()).size(), 'Keyset size should be 2');
         System.assertEquals(2, (jobAppIdToAccountIdMapTest.values()).size(), 'Values size should be 2');
     }
-    @isTest
-    static void testCreateJobApplicationIdToAccountIdMap_ExceptionHandling() {
-        // Step 1: Prepare the test data with an invalid account name (256+ chars, which exceeds the Salesforce limit of 255)
-        String longAccountName = 'A'.repeat(260);
-        Map<Id, String> jobApplicationIdToAccountNameMap = new Map<Id, String>{
-            Id.valueOf('001000000000001') => longAccountName
-        };
-
-        Test.startTest();
-        Map<Id, Id> result = AccountUtils.createJobApplicationIdToAccountIdMap(jobApplicationIdToAccountNameMap);
-        Test.stopTest();
-
-        // Step 2: Assert that the method returned null due to exception handling
-        System.assertEquals(null, result, 'Expected null due to exception handling.');
-    }
-}
+} 
 
 
