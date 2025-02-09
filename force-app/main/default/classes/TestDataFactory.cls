@@ -65,7 +65,7 @@ public class TestDataFactory {
     }
 
     public static Job_Application__c createJobApplication(Id ownerIdParam, Id accountIdParam, Id contactIdParam, Date followUpDateParam){
-        Job_Application__c testJob = new Job_Application__c(Name = 'JobApplicationName', OwnerId = ownerIdParam ,Title__c = 'TestJobTitle', Account__c = accountIdParam, Location__c = 'TestCity', PrimaryContact__c = contactIdParam, Follow_up_Date__c = followUpDateParam);
+        Job_Application__c testJob = new Job_Application__c(OwnerId = ownerIdParam ,Title__c = 'TestJobTitle', Account__c = accountIdParam, Location__c = 'TestCity', PrimaryContact__c = contactIdParam, Follow_up_Date__c = followUpDateParam);
         insert testJob;
         return testJob;
     }
