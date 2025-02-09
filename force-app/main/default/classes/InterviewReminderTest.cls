@@ -27,27 +27,26 @@ private class InterviewReminderTest {
      */
     @isTest
     static void testEmailCount() {
-        System.assertEquals(0, [SELECT COUNT() FROM EmailMessage WHERE RelatedToId IN (SELECT Id FROM Job_Application__c WHERE Name = 'JobApplicationName')] , 'There should be no found email at this stage of the test');
+        System.assertEquals(0, [SELECT COUNT() FROM EmailMessage WHERE RelatedToId IN (SELECT Id FROM Job_Application__c WHERE Title__c = 'TestJobTitle')] , 'There should be no found email at this stage of the test');
         Test.startTest();
-         // Call the batchable class
-         InterviewReminder batchJob = new InterviewReminder();
+        // Call the batchable class
+        InterviewReminder batchJob = new InterviewReminder();
          
-         // Run the batchable with a batch size of 1
-         Database.executeBatch(batchJob, 200);
+        // Run the batchable with a batch size of 1
+        Database.executeBatch(batchJob, 200);
         
-          
         Test.stopTest();
         EmailMessage emailMessage = [SELECT Id, Subject, RelatedToId, ToAddress 
         FROM EmailMessage
         WHERE  RelatedToId IN(
             SELECT Id
             FROM Job_Application__c
-            WHERE Name = 'JobApplicationName'
+            WHERE Title__c = 'TestJobTitle'
         )
         LIMIT 1
         ];
         // Assert: Verifies the correct count of email messages
-        System.assertEquals(1, [SELECT COUNT() FROM EmailMessage WHERE RelatedToId IN (SELECT Id FROM Job_Application__c WHERE Name = 'JobApplicationName')] , 'There should be one found email after the test has executed');
+        System.assertEquals(1, [SELECT COUNT() FROM EmailMessage WHERE RelatedToId IN (SELECT Id FROM Job_Application__c WHERE Title__c = 'TestJobTitle')] , 'There should be one found email after the test has executed');
         // Assert: Verifies the email subject is not null
         System.assertNotEquals(null, emailMessage.Subject, 'Should not be null');
         // Assert: Verifies the text in the email subject
