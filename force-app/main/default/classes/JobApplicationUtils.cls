@@ -31,7 +31,7 @@
         - Returns Map<Id, String> of Job_Application__c Ids to company name map
   * Step 11: AccountUtils.createJobApplicationIdToAccountIdMap(Map<Id, String> jobApplicationIdToAccountNameMap)
         - For Accounts that exist, add the Ids to the map
-        - For Accounts that do not exist, create them, get their Ids, and them to the map
+        - For Accounts that do not exist, create them, get their Ids, and add them to the map
         - Returns Map<Id, Id> - Map of Job Application Id to Account Id
     Step 12: JobApplicationUtils.insertAccounts (List<Job_Application__c> jobApps, Map<Id, Id> jobAppToAccountMap )
         - Updates the Account__c field for the job application records
@@ -58,12 +58,12 @@ public with sharing class JobApplicationUtils {
      * @return List<Object>
      */
     public static List<Object> parseResponse(HttpResponse response){
-        System.debug('response: ' + response.getBody());
+        //System.debug('response: ' + response.getBody());
         //Parse the JSON string into a Map
         Map<String, Object> parsedResponse = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
         //Get the 'jobs' list from the parsed response
         List<Object> jobs = (List<Object>) parsedResponse.get('jobs');
-        System.debug('Size of jobs ' + jobs.size());
+        //System.debug('Size of jobs ' + jobs.size());
         return jobs;
     }
     /**
@@ -79,7 +79,7 @@ public with sharing class JobApplicationUtils {
                 String externalId = String.valueOf(job.get('id'));
                 externalIds.add(externalId);
         }
-        System.debug('Size of externalIds: ' + externalIds.size());
+        //System.debug('Size of externalIds: ' + externalIds.size());
         return externalIds;
     }
     /**
@@ -90,13 +90,13 @@ public with sharing class JobApplicationUtils {
     public static List<String> removeExternalJobApplicationDuplicateIds(List<String> externalIds){
         //Check to see which records already exist
         List<Job_Application__c> duplicateRecords = [SELECT job_id__c FROM Job_Application__c WHERE job_id__c IN :externalIds];
-        System.debug('Duplicate records: ' + duplicateRecords);
+        //System.debug('Duplicate records: ' + duplicateRecords);
         //Create a list of duplicate external Ids
         List<String> duplicateExternalIds = new List<String>();
         for(Job_Application__c duplicateRecord : duplicateRecords){
             duplicateExternalIds.add(duplicateRecord.job_id__c);
         }
-        System.debug('Size of duplicateExternalIds: ' + duplicateExternalIds.size());
+        //System.debug('Size of duplicateExternalIds: ' + duplicateExternalIds.size());
         //Remove duplicateExternalIds from externalIds
         for(String duplicateExternalId : duplicateExternalIds){
             if(externalIds.contains(duplicateExternalId)){
@@ -104,8 +104,8 @@ public with sharing class JobApplicationUtils {
                 externalIds.remove(indexInList);
             }
         }
-        System.debug('Size of externalIds with duplicates removed: ' + externalIds.size());
-        System.debug('Contents of externalIds: ' + externalIds);
+        //System.debug('Size of externalIds with duplicates removed: ' + externalIds.size());
+        //System.debug('Contents of externalIds: ' + externalIds);
         return externalIds;
     }
     /**
@@ -138,11 +138,6 @@ public with sharing class JobApplicationUtils {
             
             Map<String, Object> job = (Map<String, Object>) jobObj;
             Job_Application__c jobApp = new Job_Application__c();
-
-            //Abbreviate the job application name if over 80 characters
-            String jobApplicationName = (String) job.get('title');
-            jobApplicationName = jobApplicationName.abbreviate(80);
-            jobApp.Name = jobApplicationName;
 
             jobApp.Title__c = (String) job.get('title');
             jobApp.Location__c = (String) job.get('location');
