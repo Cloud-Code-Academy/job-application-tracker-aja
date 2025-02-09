@@ -36,7 +36,6 @@ private class StaleJobApplicationDailyCleanupTest {
         Test.stopTest();
 
         List<Job_Application__c> jobs = Database.query(positiveQuery) ;
-        System.debug(jobs);
         System.assertEquals('Closed', jobs[0].Status__c,'Status should be closed');
         System.assertEquals('Closed by an automated process', jobs[0].Notes__c, 'Notes field should indicate record status changed to closed by an automated process');
     }
