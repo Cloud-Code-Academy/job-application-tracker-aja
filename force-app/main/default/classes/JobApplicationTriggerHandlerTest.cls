@@ -41,7 +41,7 @@ private class JobApplicationTriggerHandlerTest {
         Contact contact2 = new Contact(FirstName = 'Jane', LastName = 'Smith', AccountId = account.Id);
         insert new List<Contact>{ contact1, contact2 };
 
-        Job_Application__c jobApp = new Job_Application__c(Name = 'Job App 1', Account__c = account.Id);
+        Job_Application__c jobApp = new Job_Application__c(Title__c = 'Job App 1', Account__c = account.Id);
         insert jobApp;
 
         List<Job_Application__c> jobApps = [SELECT Id, PrimaryContact__c, Account__c FROM Job_Application__c WHERE Id = :jobApp.Id];
@@ -68,11 +68,11 @@ private class JobApplicationTriggerHandlerTest {
         insert testAccount;
 
         // Create a Job Application with a related Account but no related Contacts
-        Job_Application__c jobApp = new Job_Application__c(Name = 'Job App 1', Account__c = testAccount.Id);
+        Job_Application__c jobApp = new Job_Application__c(Title__c = 'Job App 1', Account__c = testAccount.Id);
         insert jobApp;
 
         // Retrieve the Job Application, ensuring Account__c is included in the query
-        Job_Application__c retrievedJobApp = [SELECT Id, Name, Account__c, PrimaryContact__c FROM Job_Application__c WHERE Id = :jobApp.Id];
+        Job_Application__c retrievedJobApp = [SELECT Id, Title__c, Account__c, PrimaryContact__c FROM Job_Application__c WHERE Id = :jobApp.Id];
 
         // Call the method
         List<Job_Application__c> jobApplications = new List<Job_Application__c> { retrievedJobApp };
@@ -97,9 +97,9 @@ private class JobApplicationTriggerHandlerTest {
         Contact contact2 = new Contact(FirstName = 'Jane', LastName = 'Smith', AccountId = account2.Id);
         insert new List<Contact>{ contact1, contact2 };
 
-        Job_Application__c jobApp1 = new Job_Application__c(Name = 'Job App 1', Account__c = account1.Id);
-        Job_Application__c jobApp2 = new Job_Application__c(Name = 'Job App 2', Account__c = account2.Id);
-        Job_Application__c jobApp3 = new Job_Application__c(Name = 'Job App 3');
+        Job_Application__c jobApp1 = new Job_Application__c(Title__c = 'Job App 1', Account__c = account1.Id);
+        Job_Application__c jobApp2 = new Job_Application__c(Title__c= 'Job App 2', Account__c = account2.Id);
+        Job_Application__c jobApp3 = new Job_Application__c(Title__c = 'Job App 3');
         insert new List<Job_Application__c>{ jobApp1, jobApp2, jobApp3 };
 
         List<Job_Application__c> jobApps = [SELECT Id, PrimaryContact__c, Account__c FROM Job_Application__c];
@@ -127,7 +127,7 @@ private class JobApplicationTriggerHandlerTest {
 static void testJobApplicationCreationWithSavedStatus() {
     // Step 1: Setup Test Data
     Job_Application__c jobApplication = new Job_Application__c(
-        Name = 'New Job Application for Saved Status',
+        Title__c = 'New Job Application for Saved Status',
         Status__c = 'Saved'
     );
     insert jobApplication;
@@ -159,7 +159,7 @@ static void testJobApplicationCreationWithSavedStatus() {
         // Step 1: Setup Test Data
         // Create a Job Application record with an initial status
         Job_Application__c jobApplication = new Job_Application__c(
-            Name = 'Test Job Application',
+            Title__c = 'Test Job Application',
             Status__c = 'Saved' // 3 tasks created
         );
         insert jobApplication;
@@ -198,7 +198,7 @@ static void testJobApplicationCreationWithSavedStatus() {
     @isTest
     static void testUpdateToApplied () {
         Job_Application__c jobApplication = new Job_Application__c(
-            Name = 'Test Job Application',
+            Title__c = 'Test Job Application',
             Status__c = 'Applying' // 5 tasks created
         );
         insert jobApplication;
@@ -215,7 +215,7 @@ static void testJobApplicationCreationWithSavedStatus() {
     @isTest
     static void testUpdateToInterviewing() {
         Job_Application__c jobApplication = new Job_Application__c(
-            Name = 'Test Job Application',
+            Title__c = 'Test Job Application',
             Status__c = 'Applied' //4 tasks created
         );
         insert jobApplication;
@@ -234,7 +234,7 @@ static void testJobApplicationCreationWithSavedStatus() {
     @isTest
     static void testUpdateToNegotiating() {
         Job_Application__c jobApplication = new Job_Application__c(
-            Name = 'Test Job Application',
+            Title__c = 'Test Job Application',
 
             Status__c = 'Interviewing' //5 tasks created
         );
@@ -254,7 +254,7 @@ static void testJobApplicationCreationWithSavedStatus() {
     @isTest
     static void testUpdateToAccepted() {
         Job_Application__c jobApplication = new Job_Application__c(
-            Name = 'Test Job Application',
+            Title__c = 'Test Job Application',
             Status__c = 'Negotiating' //3 tasks created
 
         );
@@ -274,7 +274,7 @@ static void testJobApplicationCreationWithSavedStatus() {
     @isTest
     static void testUpdateToClosed() {
         Job_Application__c jobApplication = new Job_Application__c(
-            Name = 'Test Job Application',
+            Title__c = 'Test Job Application',
 
             Status__c = 'Interviewing' //5 tasks created
         );
@@ -297,7 +297,7 @@ static void testJobApplicationCreationWithSavedStatus() {
         // Step 1: Setup Test Data
         // Create a Job Application record with an initial status
         Job_Application__c jobApplication = new Job_Application__c(
-            Name = 'Test Job Application',
+            Title__c = 'Test Job Application',
 
             Status__c = 'Saved' //3 tasks created
 
@@ -305,7 +305,7 @@ static void testJobApplicationCreationWithSavedStatus() {
         insert jobApplication;
 
         // Step 2: Update the record without changing the Status__c field
-        jobApplication.Name = 'Updated Name';
+        jobApplication.Title__c = 'Updated Name';
         update jobApplication;
 
         // Step 3: Query Tasks (No tasks should be created)
@@ -328,7 +328,7 @@ static void testJobApplicationCreationWithSavedStatus() {
 
         // Step 2: Setup Test Data
         Job_Application__c jobApplication = new Job_Application__c(
-            Name = 'Test Job Application',
+            Title__c = 'Test Job Application',
             Status__c = 'Saved'
         );
         insert jobApplication;
