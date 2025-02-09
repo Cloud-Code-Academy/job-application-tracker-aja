@@ -6,12 +6,14 @@
 public with sharing class StaleJobApplicationDailyCleanup implements Database.Batchable<sObject>, Schedulable{
     /**
      * @description Queues the job
+     * @param SchedulableContext context
      */
     public void execute(SchedulableContext context){
         System.enqueueJob(this);
     }
     /**
      * @description Queries for stale jobs
+     * @param Database.BatchableContext bc
      * @return Data.QueryLocator A list of stale jobs
      */
     public Database.QueryLocator start(Database.BatchableContext bc){
@@ -20,6 +22,8 @@ public with sharing class StaleJobApplicationDailyCleanup implements Database.Ba
     }
     /**
      * @description Executes the batch job
+     * @param Database.BatchableContext bc
+     * @param List<Job_Application__c> scope - list of job application records that need to be handled
      */
     public void execute(Database.BatchableContext bc, List<Job_Application__c> scope){
         List<Job_Application__c> jobsToUpdate = new List<Job_Application__c>();
@@ -32,6 +36,7 @@ public with sharing class StaleJobApplicationDailyCleanup implements Database.Ba
     }
     /**
      * @description This method executes at the end of the operation.  
+     * @param Database.BatchableContext bc
      */
     public void finish(Database.BatchableContext bc){
        //To do: send email to user who called method
